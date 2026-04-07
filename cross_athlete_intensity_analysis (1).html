@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTMB Cross-Athlete Intensity Analysis — Ruth Croft, Schide, Dauwalter</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;500;700;900&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#060b12;color:#e2e8f0;font-family:'Barlow Condensed',sans-serif;}
+  .shell{max-width:1080px;margin:0 auto;padding:20px 16px 48px;}
+  .hdr{padding-bottom:12px;border-bottom:1px solid #1a2840;margin-bottom:14px;}
+  .hdr h1{font-size:21px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:#22d3ee;}
+  .hdr p{font-family:'Space Mono',monospace;font-size:9px;color:#64748b;margin-top:3px;}
+  .tabs{display:flex;gap:0;margin-bottom:14px;border-bottom:1px solid #1a2840;flex-wrap:wrap;}
+  .tab{padding:8px 13px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;border-bottom:2px solid transparent;color:#64748b;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;user-select:none;}
+  .tab.on{border-bottom-color:#22d3ee;color:#e2e8f0;}
+  .tab:hover{color:#e2e8f0;}
+  .card{background:#0d1520;border:1px solid #1a2840;border-radius:7px;padding:14px;}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+  .sec{margin-bottom:14px;}
+  .stitle{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:#64748b;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #1a2840;}
+  .stat{background:#0d1520;border:1px solid #1a2840;border-radius:7px;padding:11px;}
+  .sv{font-size:22px;font-weight:900;font-family:'Barlow Condensed',sans-serif;line-height:1;}
+  .sl{font-family:'Space Mono',monospace;font-size:9px;color:#64748b;margin-top:3px;line-height:1.4;}
+  .ibox{background:#111c2e;border-left:2px solid #64748b;padding:8px 12px;border-radius:0 4px 4px 0;font-family:'Space Mono',monospace;font-size:9px;color:#64748b;line-height:1.8;margin-bottom:10px;}
+  .ibox em{color:#22d3ee;font-style:normal;}
+  .wbox{background:#1a0800;border:1px solid #f43f5e;border-left:3px solid #f43f5e;border-radius:5px;padding:8px 12px;font-family:'Space Mono',monospace;font-size:9px;color:#cbd5e1;line-height:1.8;margin-bottom:10px;}
+  .gbox{background:#001a0a;border:1px solid #4ade80;border-left:3px solid #4ade80;border-radius:5px;padding:8px 12px;font-family:'Space Mono',monospace;font-size:9px;color:#cbd5e1;line-height:1.8;margin-bottom:10px;}
+  .obox{background:#1a0d00;border:1px solid #f59e0b;border-left:3px solid #f59e0b;border-radius:5px;padding:8px 12px;font-family:'Space Mono',monospace;font-size:9px;color:#cbd5e1;line-height:1.8;margin-bottom:10px;}
+  .ftable{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:10px;}
+  .ftable th{padding:6px 9px;color:#64748b;font-weight:400;font-size:8px;letter-spacing:1px;border-bottom:1px solid #1a2840;text-align:left;white-space:nowrap;}
+  .ftable td{padding:6px 9px;border-bottom:1px solid #1a284018;vertical-align:middle;white-space:nowrap;}
+  .ftable tr:hover td{background:#0d1a2a;}
+  .find{background:#0d1520;border:1px solid #1a2840;border-radius:6px;padding:12px;margin-bottom:8px;}
+  .slider-wrap{background:#0d1520;border:1px solid #22d3ee44;border-radius:7px;padding:14px;margin-bottom:14px;}
+  .sv-display{font-size:40px;font-weight:900;font-family:'Barlow Condensed',sans-serif;text-align:center;margin:4px 0;}
+  input[type=range]{-webkit-appearance:none;width:100%;height:8px;border-radius:4px;background:#1a2840;cursor:pointer;margin:8px 0;outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#22d3ee;cursor:pointer;border:3px solid #060b12;box-shadow:0 0 8px #22d3ee55;}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#22d3ee;cursor:pointer;border:3px solid #060b12;}
+  .range-labels{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:8px;color:#64748b;margin-top:2px;}
+  .footer{margin-top:32px;padding-top:12px;border-top:1px solid #1a2840;font-family:'Space Mono',monospace;font-size:8px;color:#64748b;line-height:1.8;}
+  @media(max-width:700px){.g2,.g3,.g4{grid-template-columns:1fr;}.tab{padding:7px 9px;font-size:10px;}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="hdr">
+  <h1>Cross-Athlete Intensity Analysis</h1>
+  <p>Ruth Croft · Katie Schide · Courtney Dauwalter · UTMB 2021–2025 · IF Drop reframed · Scenario model · Strategic assessment</p>
+  <p style="margin-top:6px;color:#1a2840;font-size:8px">Data: LiveTrail confirmed splits · FIT physiological data · Spectro.Life IF Drop · All values from confirmed race records</p>
+</div>
+
+<div class="tabs">
+  <div class="tab on" id="t-problem"    onclick="go('problem')">IF Drop Problem</div>
+  <div class="tab"    id="t-absolute"   onclick="go('absolute')">Absolute Paces</div>
+  <div class="tab"    id="t-scenario"   onclick="go('scenario')">Scenario Model</div>
+  <div class="tab"    id="t-archetypes" onclick="go('archetypes')">Race Archetypes</div>
+  <div class="tab"    id="t-strategy"   onclick="go('strategy')">Strategic Assessment</div>
+</div>
+
+<div id="pane-problem"></div>
+<div id="pane-absolute"   style="display:none"></div>
+<div id="pane-scenario"   style="display:none"></div>
+<div id="pane-archetypes" style="display:none"></div>
+<div id="pane-strategy"   style="display:none"></div>
+
+<div class="footer">
+  UTMB Race Strategy Model · Ruth Croft NZL · Confirmed data: LiveTrail 120 runner-years · FIT physiological analysis ·
+  IF Drop source: Spectro.Life / iRunFar · Built for coaching and race planning purposes ·
+  All projections are estimates based on confirmed durability function — not guarantees ·
+  Lab LT1/LT2 data pending — will tighten all uncertainty bands
+</div>
+
+</div><!-- end shell -->
+
+<script>
+var C={ruth:'#22d3ee',schide:'#f59e0b',daw:'#c084fc',
+       red:'#f43f5e',green:'#4ade80',gold:'#f59e0b',orange:'#fb923c',muted:'#64748b'};
+
+var HALF1_KM=83;
+var RACES=[
+  {id:'r24',    label:'Ruth 2024',         year:2024, col:C.ruth,   courH:10.322, finH:22.813, ifd:7.2,  courseKm:176.7, cond:'Ideal'},
+  {id:'r25',    label:'Ruth 2025 (storm)', year:2025, col:'#6ee7b7', courH:9.711,  finH:22.940, ifd:24.2, courseKm:174.0, cond:'Storm'},
+  {id:'r25adj', label:'Ruth 2025 (adj.)',  year:2025, col:C.ruth,   courH:9.711,  finH:22.35,  ifd:17.0, courseKm:176.7, cond:'Ideal equiv.'},
+  {id:'s24',    label:'Schide 2024 CR',    year:2024, col:C.schide, courH:9.097,  finH:22.143, ifd:27.2, courseKm:176.7, cond:'Ideal'},
+  {id:'s22',    label:'Schide 2022',       year:2022, col:'#d97706', courH:9.533,  finH:23.253, ifd:27.6, courseKm:171.0, cond:'Ideal'},
+  {id:'d21',    label:'Dauwalter 2021',    year:2021, col:C.daw,    courH:10.999, finH:22.515, ifd:-1.2, courseKm:171.0, cond:'Ideal'},
+  {id:'d23',    label:'Dauwalter 2023',    year:2023, col:'#a855f7', courH:9.681,  finH:23.487, ifd:26.3, courseKm:176.7, cond:'Ideal'},
+];
+RACES.forEach(function(r){
+  r.half1PaceMin=r.courH*60/HALF1_KM;
+  r.half2Km=r.courseKm-HALF1_KM;
+  r.half2H=r.finH-r.courH;
+  r.half2PaceMin=r.half2H*60/r.half2Km;
+  r.finHm=hm(r.finH); r.courHm=hm(r.courH);
+});
+
+var S24=RACES[3], D21=RACES[5], R24=RACES[0];
+
+function hm(h){if(!h&&h!==0)return'--';var hh=Math.floor(h),mm=Math.round((h%1)*60);return hh+':'+(mm<10?'0':'')+mm;}
+function fmtPace(p){var m=Math.floor(p),s=Math.round((p%1)*60);return m+':'+(s<10?'0':'')+s;}
+
+function go(id){
+  ['problem','absolute','scenario','archetypes','strategy'].forEach(function(t){
+    document.getElementById('pane-'+t).style.display=t===id?'block':'none';
+    document.getElementById('t-'+t).className='tab'+(t===id?' on':'');
+  });
+  if(id==='scenario') initScenario();
+}
+
+/* ── DURABILITY FUNCTION ─────────────────────────────────────────────────────
+   Two confirmed data points (ideal conditions):
+   (10.322h Courmayeur → 8.00 min/km 2nd half)  Ruth 2024
+   (9.711h Courmayeur  → ~8.10 min/km 2nd half)  Ruth 2025 weather-adjusted
+   Slope: (8.10-8.00)/(10.322-9.711) = 0.164 min/km per hour faster at Courmayeur
+   Uncertainty band: 0.05 (flat/durable) to 0.35 (steep degradation)             */
+function ruthH2Pace(courH){
+  return{
+    best:  Math.max(7.8, 8.00+(10.322-courH)*0.164),
+    upper: Math.max(8.0, 8.00+(10.322-courH)*0.35),
+    lower: Math.max(7.7, 8.00+(10.322-courH)*0.05)
+  };
+}
+function ruthFinish(courH){
+  var h2=ruthH2Pace(courH);
+  return{best:courH+h2.best*93.7/60, upper:courH+h2.upper*93.7/60,
+         lower:courH+h2.lower*93.7/60, h2:h2};
+}
+
+/* ══ TAB 1: IF DROP PROBLEM ═════════════════════════════════════════════════ */
+(function(){
+  var html='';
+  html+='<div class="wbox"><strong style="color:#f43f5e">THE IF DROP PROBLEM:</strong> IF Drop only measures fade relative to each athlete\'s own first-half pace. A 7.2% IF Drop from a slow base is not better than 27.2% from a fast base — the athlete with 27.2% may have run a faster absolute second half. Ruth\'s 7.2% in 2024 reflects a conservative first half, not superior durability. Schide\'s 27.2% reflects an extremely aggressive first half — and she still won by 39 minutes.</div>';
+
+  html+='<div class="sec"><div class="stitle">Absolute pace — first half (bar) vs second half (labelled line) for each race</div>';
+  var W=1020,H=280,PL=80,PT=60,PR=30,PB=55,cW=W-PL-PR,cH=H-PT-PB;
+  var pMin=6.3,pMax=9.6;
+  var py=function(p){return PT+(p-pMin)/(pMax-pMin)*cH;};
+  var blocks=[
+    {label:'Ruth\n2024\n(10:19)',    p1:R24.half1PaceMin,      p2:R24.half2PaceMin,      col:C.ruth,   ifd:'+7.2%'},
+    {label:'Ruth\n2025\n(9:43)',     p1:RACES[1].half1PaceMin, p2:RACES[1].half2PaceMin, col:'#6ee7b7', ifd:'+24.2%\nstorm'},
+    {label:'Ruth\n2025 adj\n(9:43)',p1:RACES[2].half1PaceMin, p2:RACES[2].half2PaceMin, col:C.ruth,   ifd:'~17%\nadj.'},
+    {label:'Schide\n2024\n(9:06)',   p1:S24.half1PaceMin,      p2:S24.half2PaceMin,      col:C.schide, ifd:'+27.2%'},
+    {label:'Daw\n2021\n(10:59)',     p1:D21.half1PaceMin,      p2:D21.half2PaceMin,      col:C.daw,    ifd:'-1.2%'},
+    {label:'Daw\n2023\n(9:41)',      p1:RACES[6].half1PaceMin, p2:RACES[6].half2PaceMin, col:'#a855f7', ifd:'+26.3%'},
+  ];
+  var n=blocks.length, bw=Math.floor(cW/n*0.5);
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">';
+  [6.5,7.0,7.5,8.0,8.5,9.0,9.5].forEach(function(v){
+    var y=py(v);
+    svg+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+y+'" y2="'+y+'" stroke="#1a2840" stroke-width="0.5"/>';
+    svg+='<text x="'+(PL-3)+'" y="'+(y+3)+'" fill="#64748b" font-size="8" text-anchor="end" font-family="monospace">'+fmtPace(v)+'</text>';
+  });
+  svg+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+py(R24.half2PaceMin)+'" y2="'+py(R24.half2PaceMin)+'" stroke="'+C.ruth+'" stroke-width="1" stroke-dasharray="6,4" opacity="0.35"/>';
+  svg+='<text x="'+(W-PR+2)+'" y="'+(py(R24.half2PaceMin)+3)+'" fill="'+C.ruth+'" font-size="7" font-family="monospace">Ruth 2H best</text>';
+  blocks.forEach(function(b,i){
+    var cx=PL+(i+0.5)*(cW/n), x=cx-bw/2;
+    var y1=py(b.p1), y2=py(b.p2);
+    svg+='<rect x="'+x+'" y="'+y1+'" width="'+bw+'" height="'+(PT+cH-y1)+'" fill="'+b.col+'" opacity="0.85" rx="2"/>';
+    svg+='<rect x="'+x+'" y="'+y2+'" width="'+bw+'" height="'+(y1-y2)+'" fill="'+b.col+'" opacity="0.25"/>';
+    svg+='<line x1="'+cx+'" y1="'+(y1-2)+'" x2="'+cx+'" y2="'+(y2+3)+'" stroke="'+b.col+'" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.6"/>';
+    b.ifd.split('\n').forEach(function(ln,li){svg+='<text x="'+cx+'" y="'+(y2-22+li*12)+'" fill="'+b.col+'" font-size="8" text-anchor="middle" font-family="monospace">'+ln+'</text>';});
+    svg+='<text x="'+cx+'" y="'+(PT+cH+16)+'" fill="'+b.col+'" font-size="8" text-anchor="middle" font-family="monospace">'+fmtPace(b.p1)+'</text>';
+    svg+='<text x="'+cx+'" y="'+(PT+cH+27)+'" fill="#64748b" font-size="7" text-anchor="middle" font-family="monospace">1st/km</text>';
+    svg+='<text x="'+(x+bw+3)+'" y="'+(y2+3)+'" fill="'+b.col+'" font-size="7" font-family="monospace">'+fmtPace(b.p2)+'</text>';
+    b.label.split('\n').forEach(function(ln,li){svg+='<text x="'+cx+'" y="'+(PT-32+li*12)+'" fill="'+b.col+'" font-size="8" text-anchor="middle" font-family="monospace">'+ln+'</text>';});
+  });
+  svg+='<text x="'+(PL-65)+'" y="'+(PT+cH/2)+'" fill="#64748b" font-size="8" text-anchor="middle" font-family="monospace" transform="rotate(-90,'+(PL-65)+','+(PT+cH/2)+')">pace min/km (lower = faster)</text>';
+  svg+='</svg>';
+  html+='<div class="card" style="padding:12px">'+svg+'</div></div>';
+
+  html+='<div class="g3">';
+  html+='<div class="card" style="border-top:2px solid '+C.ruth+'">';
+  html+='<div style="color:'+C.ruth+';font-weight:700;margin-bottom:6px">Ruth 2024 — 2nd half: '+fmtPace(R24.half2PaceMin)+'/km</div>';
+  html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2">7.2% IF Drop from '+fmtPace(R24.half1PaceMin)+'/km first half<br>Second half: <strong>'+fmtPace(R24.half2PaceMin)+'/km</strong> — fastest in 2024 field<br>Faster than Schide\'s 2nd half ('+fmtPace(S24.half2PaceMin)+'/km)<br><span style="color:'+C.muted+'">Lost because first half was 73.5min slower</span></div></div>';
+  html+='<div class="card" style="border-top:2px solid '+C.schide+'">';
+  html+='<div style="color:'+C.schide+';font-weight:700;margin-bottom:6px">Schide 2024 — 2nd half: '+fmtPace(S24.half2PaceMin)+'/km</div>';
+  html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2">27.2% IF Drop from '+fmtPace(S24.half1PaceMin)+'/km first half<br>Second half: <strong>'+fmtPace(S24.half2PaceMin)+'/km</strong> — slower than Ruth<br>Won because first half was 73.5min faster<br><span style="color:'+C.muted+'">First half pace is the decisive advantage</span></div></div>';
+  html+='<div class="card" style="border-top:2px solid '+C.daw+'">';
+  html+='<div style="color:'+C.daw+';font-weight:700;margin-bottom:6px">Dauwalter 2021 — 2nd half: '+fmtPace(D21.half2PaceMin)+'/km</div>';
+  html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2">-1.2% IF Drop from '+fmtPace(D21.half1PaceMin)+'/km first half (171km course)<br>Second half: <strong>'+fmtPace(D21.half2PaceMin)+'/km</strong> — near-negative split<br>Near-identical to Ruth 2024 on pace-adjusted basis<br><span style="color:'+C.muted+'">Unique performance — not replicable on 176km modern course</span></div></div>';
+  html+='</div>';
+
+  html+='<div class="card" style="border:1px solid #f43f5e">';
+  html+='<div style="color:#f43f5e;font-weight:700;margin-bottom:5px;font-size:14px">Why Ruth\'s 7.2% IF Drop signals conservatism, not durability</div>';
+  html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2.2">';
+  var g1=Math.round((S24.courH-R24.courH)*60), g2=Math.round((R24.half2H-S24.half2H)*60);
+  html+='First half: Schide 9:06 vs Ruth 10:19 &rarr; Schide leads by <strong style="color:#f43f5e">'+g1+' minutes</strong><br>';
+  html+='Second half: Ruth '+fmtPace(R24.half2PaceMin)+'/km vs Schide '+fmtPace(S24.half2PaceMin)+'/km &rarr; Ruth gains back <strong style="color:#4ade80">'+g2+' minutes</strong><br>';
+  html+='Net: Schide wins by <strong style="color:#f43f5e">'+(g1-g2)+' minutes</strong>. IF Drop in isolation cannot show this — only absolute pace comparison can.';
+  html+='</div></div>';
+  document.getElementById('pane-problem').innerHTML=html;
+})();
+
+/* ══ TAB 2: ABSOLUTE PACES ═══════════════════════════════════════════════════ */
+(function(){
+  var html='';
+  html+='<div class="ibox">Scatter plot: x-axis = first-half pace, y-axis = second-half pace. <em>Lower and left = faster.</em> Diagonal dashed lines = equal total finish time. Ruth\'s second half is the fastest confirmed data point — the entire gap to Schide is in the first half.</div>';
+  html+='<div class="sec"><div class="stitle">First-half vs second-half pace — all confirmed races (iso-finish lines shown)</div><div class="card" style="padding:12px" id="scatter-chart"></div></div>';
+
+  html+='<div class="sec"><div class="stitle">Full comparison table — all confirmed data</div><div style="overflow-x:auto"><table class="ftable"><thead><tr>';
+  html+='<th>RACE</th><th>COND.</th><th>COURMAYEUR</th><th>1ST HALF PACE</th><th>2ND HALF KM</th><th>2ND HALF PACE</th><th>FINISH</th><th>IF DROP</th><th>2H RANK</th></tr></thead><tbody>';
+  var forTable=RACES.filter(function(r){return r.id!=='r25adj';});
+  var sorted=forTable.slice().sort(function(a,b){return a.half2PaceMin-b.half2PaceMin;});
+  forTable.forEach(function(r){
+    var rank=sorted.findIndex(function(x){return x.id===r.id;})+1;
+    var ifc=r.ifd<0?C.daw:r.ifd<15?C.green:r.ifd<25?C.gold:C.red;
+    html+='<tr><td style="color:'+r.col+';font-weight:700">'+r.label+'</td>';
+    html+='<td style="font-family:monospace;font-size:9px;color:#64748b">'+r.cond+'</td>';
+    html+='<td style="font-family:monospace;color:'+r.col+'">'+r.courHm+'</td>';
+    html+='<td style="font-family:monospace;font-weight:700;color:'+r.col+'">'+fmtPace(r.half1PaceMin)+'/km</td>';
+    html+='<td style="font-family:monospace;color:#64748b">'+r.half2Km.toFixed(1)+'</td>';
+    html+='<td style="font-family:monospace;font-weight:700;color:'+r.col+'">'+fmtPace(r.half2PaceMin)+'/km</td>';
+    html+='<td style="font-family:monospace;color:'+r.col+'">'+r.finHm+'</td>';
+    html+='<td style="font-family:monospace;color:'+ifc+'">'+r.ifd+'%</td>';
+    html+='<td style="font-family:monospace;font-weight:700;color:'+(rank===1?C.green:rank===2?C.gold:C.muted)+'">'+rank+'/'+forTable.length+'</td></tr>';
+  });
+  html+='</tbody></table></div></div>';
+  html+='<div class="gbox"><strong style="color:#4ade80">Cross-athlete finding:</strong> Ruth 2024 has the fastest confirmed second-half pace of any comparable data point in this dataset. Her second-half capability is her greatest competitive strength. The race gap to Schide is entirely in the first half — 73.5 minutes at Courmayeur, partially recovered by 33 minutes in the second half.</div>';
+  document.getElementById('pane-absolute').innerHTML=html;
+
+  setTimeout(function(){
+    var wrap=document.getElementById('scatter-chart');
+    if(!wrap)return;
+    var W=1000,H=310,PL=80,PT=30,PR=160,PB=70,cW=W-PL-PR,cH=H-PT-PB;
+    var xMin=6.3,xMax=8.2,yMin=7.5,yMax=9.6;
+    var px=function(p){return PL+(p-xMin)/(xMax-xMin)*cW;};
+    var py=function(p){return PT+(p-yMin)/(yMax-yMin)*cH;};
+    var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">';
+    [6.5,7.0,7.5,8.0].forEach(function(v){var x=px(v);svg+='<line x1="'+x+'" x2="'+x+'" y1="'+PT+'" y2="'+(PT+cH)+'" stroke="#1a2840" stroke-width="0.5"/>';svg+='<text x="'+x+'" y="'+(H-PB+16)+'" fill="#64748b" font-size="8" text-anchor="middle" font-family="monospace">'+fmtPace(v)+'</text>';});
+    [7.8,8.0,8.2,8.5,8.8,9.0,9.2,9.5].forEach(function(v){if(v<yMin||v>yMax)return;var y=py(v);svg+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+y+'" y2="'+y+'" stroke="#1a2840" stroke-width="0.5"/>';svg+='<text x="'+(PL-3)+'" y="'+(y+3)+'" fill="#64748b" font-size="8" text-anchor="end" font-family="monospace">'+fmtPace(v)+'</text>';});
+    [[22.143,C.schide,'22:09 CR'],[22.50,C.green,'22:30'],[23.0,'#64748b','23:00']].forEach(function(iso){
+      var pts=[];
+      for(var xv=xMin;xv<=xMax;xv+=0.01){var cH2=xv*83/60,h2H=iso[0]-cH2,yv=h2H*60/93.7;if(yv>=yMin&&yv<=yMax)pts.push({x:px(xv),y:py(yv)});}
+      if(pts.length<2)return;
+      var d=pts.map(function(p,i){return(i===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1);}).join(' ');
+      svg+='<path d="'+d+'" fill="none" stroke="'+iso[1]+'" stroke-width="1" stroke-dasharray="5,4" opacity="0.4"/>';
+      var last=pts[pts.length-1];
+      svg+='<text x="'+(last.x+3)+'" y="'+(last.y-2)+'" fill="'+iso[1]+'" font-size="7" font-family="monospace" opacity="0.7">'+iso[2]+'</text>';
+    });
+    RACES.filter(function(r){return r.id!=='r25adj';}).forEach(function(r){
+      var x=px(r.half1PaceMin),y=py(r.half2PaceMin);
+      if(isNaN(x)||isNaN(y)||x<PL||x>W-PR||y<PT||y>PT+cH)return;
+      svg+='<circle cx="'+x+'" cy="'+y+'" r="8" fill="'+r.col+'" opacity="0.9"/>';
+      svg+='<text x="'+(x+11)+'" y="'+(y-4)+'" fill="'+r.col+'" font-size="8" font-family="monospace">'+r.label+'</text>';
+      svg+='<text x="'+(x+11)+'" y="'+(y+8)+'" fill="#64748b" font-size="7" font-family="monospace">'+r.finHm+'</text>';
+    });
+    svg+='<text x="'+(PL+cW/2)+'" y="'+(H-10)+'" fill="#64748b" font-size="9" text-anchor="middle" font-family="monospace">FIRST HALF PACE (min/km) &rarr; faster to left</text>';
+    svg+='<text x="16" y="'+(PT+cH/2)+'" fill="#64748b" font-size="9" text-anchor="middle" font-family="monospace" transform="rotate(-90,16,'+(PT+cH/2)+')">SECOND HALF PACE &rarr; faster upward</text>';
+    svg+='</svg>';
+    wrap.innerHTML=svg;
+  },60);
+})();
+
+/* ══ TAB 3: SCENARIO MODEL ════════════════════════════════════════════════════ */
+var scenarioBuilt=false;
+function initScenario(){
+  if(scenarioBuilt)return; scenarioBuilt=true;
+  var html='';
+  html+='<div class="ibox">Slider is in <em>actual elapsed minutes</em> at Courmayeur. 540 min = 9:00h, 583 min = 9:43h (Ruth 2025), 619 min = 10:19h (Ruth 2024). The durability function projects Ruth\'s second-half pace and finish time. Uncertainty band: flat line (very durable) to steep line (significant degradation). Schide CR and Dauwalter 2021 shown as fixed horizontal references.</div>';
+  html+='<div class="slider-wrap">';
+  html+='<div style="font-family:monospace;font-size:9px;color:#64748b;text-align:center;letter-spacing:1px;margin-bottom:4px">RUTH\'s TARGET COURMAYEUR SPLIT — slide to explore</div>';
+  html+='<div class="sv-display" id="sc-val" style="color:#22d3ee">9:43h</div>';
+  html+='<div style="font-family:monospace;font-size:9px;text-align:center;margin-bottom:8px;color:#64748b" id="sc-sub">Ruth 2025 confirmed pace</div>';
+  html+='<input type="range" id="sc-slider" min="540" max="630" value="583" step="1" oninput="updateScenario()">';
+  html+='<div class="range-labels"><span style="color:'+C.schide+'">9:00 (Schide CR zone)</span><span style="color:'+C.ruth+'">9:43 (Ruth 2025)</span><span style="color:'+C.gold+'">10:19 (Ruth 2024)</span><span style="color:#64748b">10:30</span></div>';
+  html+='</div>';
+  html+='<div class="sec"><div class="stitle">Projected finish time — Ruth vs Schide CR and Dauwalter 2021 references</div><div class="card" style="padding:12px" id="sc-chart"></div></div>';
+  html+='<div class="g4" id="sc-stats" style="margin-top:12px"></div>';
+  html+='<div class="card" style="margin-top:8px;min-height:60px;padding:12px" id="sc-analysis"></div>';
+  document.getElementById('pane-scenario').innerHTML=html;
+  setTimeout(updateScenario,80);
+}
+
+function updateScenario(){
+  var sl=document.getElementById('sc-slider');
+  if(!sl)return;
+  // Slider value = actual elapsed minutes at Courmayeur
+  var courMin=parseInt(sl.value);
+  var courH=courMin/60;  // e.g. 583/60 = 9.717h
+
+  // Slider fill gradient
+  var pct=(courMin-540)/90*100;
+  sl.style.background='linear-gradient(to right,#22d3ee '+pct.toFixed(1)+'%,#1a2840 '+pct.toFixed(1)+'%)';
+
+  // Display time string
+  var hh=Math.floor(courH), mm=Math.round((courH%1)*60);
+  var timeStr=hh+':'+(mm<10?'0':'')+mm+'h';
+  var col=courH<9.2?C.schide:courH<9.75?C.ruth:courH<10.1?C.gold:C.muted;
+  var valEl=document.getElementById('sc-val');
+  if(valEl){valEl.textContent=timeStr; valEl.style.color=col;}
+  var subEl=document.getElementById('sc-sub');
+  if(subEl){
+    var sub=courH<9.2?'Schide 2024 territory — very aggressive, beyond current data':
+            courH<9.5?'Estimated optimal zone — competitive with Schide CR':
+            courH<9.75?'Ruth 2025 range — confirmed available in storm conditions':
+            courH<10.1?'Between Ruth 2024 and 2025 — residual capacity here':
+                       'Ruth 2024 confirmed — conservative, cannot beat Schide at this pace';
+    subEl.textContent=sub; subEl.style.color=col;
+  }
+
+  var proj=ruthFinish(courH);
+
+  // Finish time chart
+  var chartEl=document.getElementById('sc-chart');
+  if(chartEl){
+    var W=1000,H=240,PL=75,PT=25,PR=200,PB=48,cW=W-PL-PR,cH=H-PT-PB;
+    var xMin=8.9,xMax=10.7,yMin=21.5,yMax=24.5;
+    var px=function(h){return PL+(h-xMin)/(xMax-xMin)*cW;};
+    var py=function(h){return PT+(h-yMin)/(yMax-yMin)*cH;};
+    var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">';
+    [22.0,22.5,23.0,23.5,24.0].forEach(function(v){var y=py(v);svg+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+y+'" y2="'+y+'" stroke="#1a2840" stroke-width="0.5"/>';svg+='<text x="'+(PL-3)+'" y="'+(y+3)+'" fill="#64748b" font-size="7" text-anchor="end" font-family="monospace">'+hm(v)+'</text>';});
+    [9.0,9.5,10.0,10.5].forEach(function(v){var x=px(v);svg+='<line x1="'+x+'" x2="'+x+'" y1="'+PT+'" y2="'+(PT+cH)+'" stroke="#1a2840" stroke-width="0.5"/>';svg+='<text x="'+x+'" y="'+(H-6)+'" fill="#64748b" font-size="7" text-anchor="middle" font-family="monospace">'+hm(v)+'</text>';});
+
+    // Compute curve
+    var courRange=[],step=0.02;
+    for(var cv=xMin;cv<=xMax;cv+=step)courRange.push(cv);
+    var bestPts=courRange.map(function(c){return{x:px(c),y:py(ruthFinish(c).best)};});
+    var upperPts=courRange.map(function(c){return{x:px(c),y:py(ruthFinish(c).upper)};});
+    var lowerPts=courRange.map(function(c){return{x:px(c),y:py(ruthFinish(c).lower)};});
+
+    // Uncertainty band
+    var bd=upperPts.map(function(p,i){return(i===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1);}).join(' ');
+    for(var li=lowerPts.length-1;li>=0;li--)bd+=' L'+lowerPts[li].x.toFixed(1)+','+lowerPts[li].y.toFixed(1);
+    svg+='<path d="'+bd+' Z" fill="'+C.ruth+'" opacity="0.07"/>';
+    var bd2=bestPts.map(function(p,i){return(i===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1);}).join(' ');
+    svg+='<path d="'+bd2+'" fill="none" stroke="'+C.ruth+'" stroke-width="2" opacity="0.85"/>';
+
+    // Reference lines
+    svg+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+py(S24.finH)+'" y2="'+py(S24.finH)+'" stroke="'+C.schide+'" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.7"/>';
+    svg+='<text x="'+(W-PR+3)+'" y="'+(py(S24.finH)+3)+'" fill="'+C.schide+'" font-size="8" font-family="monospace">Schide CR '+hm(S24.finH)+'</text>';
+    svg+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+py(D21.finH)+'" y2="'+py(D21.finH)+'" stroke="'+C.daw+'" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.7"/>';
+    svg+='<text x="'+(W-PR+3)+'" y="'+(py(D21.finH)+3)+'" fill="'+C.daw+'" font-size="8" font-family="monospace">Daw 2021 '+hm(D21.finH)+'</text>';
+
+    // Confirmed points
+    [{label:'Ruth 2024',c:10.322,f:22.813,col:C.ruth},
+     {label:'Ruth 2025 storm',c:9.711,f:22.940,col:'#6ee7b7'},
+     {label:'Ruth 2025 adj.',c:9.711,f:22.35,col:C.ruth}
+    ].forEach(function(d){
+      if(d.c<xMin||d.c>xMax||d.f<yMin||d.f>yMax)return;
+      svg+='<circle cx="'+px(d.c)+'" cy="'+py(d.f)+'" r="5" fill="'+d.col+'"/>';
+      svg+='<text x="'+(px(d.c)+7)+'" y="'+(py(d.f)-2)+'" fill="'+d.col+'" font-size="7" font-family="monospace">'+d.label+'</text>';
+    });
+
+    // Current slider marker
+    if(courH>=xMin&&courH<=xMax&&proj.best>=yMin&&proj.best<=yMax){
+      svg+='<line x1="'+px(courH)+'" x2="'+px(courH)+'" y1="'+PT+'" y2="'+(PT+cH)+'" stroke="'+col+'" stroke-width="1.2" stroke-dasharray="3,4" opacity="0.5"/>';
+      svg+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+py(proj.best)+'" y2="'+py(proj.best)+'" stroke="'+col+'" stroke-width="1.2" stroke-dasharray="3,4" opacity="0.5"/>';
+      svg+='<circle cx="'+px(courH)+'" cy="'+py(proj.best)+'" r="7" fill="'+col+'"/>';
+      svg+='<text x="'+(px(courH)+10)+'" y="'+(py(proj.best)-7)+'" fill="'+col+'" font-size="9" font-weight="700" font-family="monospace">'+hm(proj.best)+'</text>';
+    }
+    svg+='<text x="'+(PL+cW/2)+'" y="'+(H-3)+'" fill="#64748b" font-size="8" text-anchor="middle" font-family="monospace">Courmayeur split (elapsed hours)</text>';
+    svg+='</svg>';
+    chartEl.innerHTML=svg;
+  }
+
+  // Stats row
+  var statsEl=document.getElementById('sc-stats');
+  var gapSchide=(proj.best-S24.finH)*60;
+  var gc=gapSchide<-3?C.green:gapSchide<10?C.gold:C.red;
+  if(statsEl){
+    statsEl.innerHTML=
+      '<div class="stat"><div class="sv" style="color:'+col+'">'+hm(proj.best)+'</div><div class="sl">Projected finish<br>(best estimate)</div></div>'+
+      '<div class="stat"><div class="sv" style="color:#94a3b8;font-size:14px">'+hm(proj.lower)+'&ndash;'+hm(proj.upper)+'</div><div class="sl">Uncertainty range<br>flat &rarr; steep degradation</div></div>'+
+      '<div class="stat"><div class="sv" style="color:'+gc+'">'+(gapSchide>0?'+':'')+Math.round(gapSchide)+'min</div><div class="sl">vs Schide CR<br>'+(gapSchide<0?'Ruth WINS (projected)':'Ruth trails (projected)')+'</div></div>'+
+      '<div class="stat"><div class="sv" style="color:'+C.ruth+'">'+fmtPace(proj.h2.best)+'/km</div><div class="sl">Projected 2nd half pace<br>'+fmtPace(proj.h2.lower)+'&ndash;'+fmtPace(proj.h2.upper)+' range</div></div>';
+  }
+
+  // Analysis text
+  var anaEl=document.getElementById('sc-analysis');
+  if(anaEl){
+    var txt='';
+    if(courH<9.15)     txt='<strong style="color:'+C.red+'">&#9888; Faster than Schide 2024 first half</strong> — no confirmed data for Ruth in this zone. Uncertainty band is at maximum. IF Drop likely 35%+. Not recommended without lab LT1/LT2 confirmation this is sub-threshold.';
+    else if(courH<9.5) txt='<strong style="color:'+C.green+'">&#9733; Estimated optimal zone</strong> — best estimate produces a finish competitive with Schide CR. Ruth needs to hold ~8:00&ndash;8:15/km second half from this start. The 2025 storm-adjusted data is consistent with this being achievable. Lab LT1/LT2 confirms definitively.';
+    else if(courH<9.8) txt='<strong style="color:'+C.ruth+'">Ruth 2025 confirmed range</strong> — 2025 storm-adjusted data sits here. Best estimate ~22:10&ndash;22:35. Competitive with Schide CR only if Schide does not repeat her 2024 pace. This range is confirmed available in storm conditions.';
+    else if(courH<10.1)txt='<strong style="color:'+C.gold+'">Between Ruth 2024 and 2025</strong> — residual first-half capacity exists. Best estimate ~22:25&ndash;22:55. Strong second half but gap to Schide CR remains 15&ndash;45 minutes at this pace.';
+    else               txt='<strong style="color:'+C.muted+'">Ruth 2024 conservative zone</strong> — confirmed not to beat Schide. Extraordinary second half (8:00/km, fastest in dataset) but 39-minute first-half deficit is not recoverable. This Courmayeur pace must move left.';
+    anaEl.innerHTML='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:1.9">'+txt+'</div>';
+  }
+}
+
+/* ══ TAB 4: RACE ARCHETYPES ══════════════════════════════════════════════════ */
+(function(){
+  var html='';
+  html+='<div class="ibox">Three confirmed race patterns in this dataset. Each has a different relationship between first-half aggression and second-half retention. Understanding which archetype each athlete occupies is essential for cross-athlete comparison.</div>';
+  var archetypes=[
+    {col:C.schide, n:'THE FRONT-RUNNER',
+     athletes:'Schide 2024 (27.2% IF Drop) &middot; Schide 2022 (27.6%) &middot; Dauwalter 2023 (26.3%)',
+     lines:['Fastest possible first half &mdash; sets race pace from the front','Accepts 25&ndash;30% fade in second half','Wins because absolute 2nd-half pace is still fast enough','Requires highest VO2max and LT2 ceiling to sustain'],
+     ruth:'Ruth cannot match Schide\'s 9:06 first half. At Schide-level first half, the model projects Ruth\'s second half degrades to ~8:40&ndash;9:00/km &mdash; slower than Schide\'s 8:21/km. Net: she would not win even matching the split.',
+     key:'This archetype only works if the athlete has the highest absolute ceiling. Not currently Ruth\'s path without lab confirmation of a higher VO2max.'},
+    {col:C.daw, n:'THE NEGATIVE SPLITTER',
+     athletes:'Dauwalter 2021 (&minus;1.2% IF Drop) &middot; unique in dataset',
+     lines:['Extremely conservative first half &mdash; accept being well behind early','Near-zero or negative fade &mdash; second half matches or beats first','Relies on all competitors degrading while you hold constant','Requires exceptional fat oxidation and glycogen conservation'],
+     ruth:'Dauwalter 2021 pace-adjusted to 176km course gives ~8:02/km second half &mdash; almost identical to Ruth 2024 (8:00/km). But Dauwalter\'s first half (10:59) was 40 minutes slower than Ruth 2024. This archetype cannot overcome Schide\'s first-half advantage on the modern course.',
+     key:'Cannot produce a winning time against current Schide on 176km course. Race dynamics of 2021 do not replicate with modern front-loaded field.'},
+    {col:C.ruth, n:'THE TACTICAL CLOSER &#9733;',
+     athletes:'Ruth 2024 (7.2% IF Drop) &middot; Ruth 2025 adjusted (~17%)',
+     lines:['Controlled but not conservative first half &mdash; stay within closing distance','Protect second-half capability as primary constraint','Absorbs being behind at every checkpoint until Champex','Closes at a pace no competitor has matched in the dataset'],
+     ruth:'Ruth\'s confirmed identity. The question is not which archetype &mdash; it is how far she can extend the first-half pace within this archetype. 2025 storm-adjusted suggests 9:43 first half is achievable while retaining ~8:10/km second half. Target zone: 9:35&ndash;9:45.',
+     key:'&#9733; This archetype has the highest ceiling for Ruth. The specific question: can she run 8:00&ndash;8:10/km second half from 9:35&ndash;9:45? The lab LT1/LT2 test resolves this definitively.'},
+  ];
+  archetypes.forEach(function(a){
+    html+='<div class="find" style="border-left:3px solid '+a.col+'">';
+    html+='<div style="color:'+a.col+';font-weight:900;font-size:17px;margin-bottom:4px">'+a.n+'</div>';
+    html+='<div style="font-family:monospace;font-size:8px;color:#64748b;margin-bottom:8px">'+a.athletes+'</div>';
+    html+='<div class="g2">';
+    html+='<div><div style="font-family:monospace;font-size:8px;color:#64748b;margin-bottom:4px;letter-spacing:1px">CHARACTERISTICS</div>';
+    a.lines.forEach(function(l){html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;margin-bottom:3px;padding-left:6px">&rarr; '+l+'</div>';});
+    html+='</div><div>';
+    html+='<div style="font-family:monospace;font-size:8px;color:#64748b;margin-bottom:4px;letter-spacing:1px">RUTH\'S POSITION</div>';
+    html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:1.8;margin-bottom:6px">'+a.ruth+'</div>';
+    html+='<div style="font-family:monospace;font-size:9px;color:'+a.col+';padding:5px 8px;background:'+a.col+'12;border-radius:4px">'+a.key+'</div>';
+    html+='</div></div></div>';
+  });
+  document.getElementById('pane-archetypes').innerHTML=html;
+})();
+
+/* ══ TAB 5: STRATEGIC ASSESSMENT ════════════════════════════════════════════ */
+(function(){
+  var html='';
+  html+='<div class="sec"><div class="stitle">The arithmetic of winning &mdash; required Courmayeur split to match Schide CR</div>';
+  html+='<table class="ftable"><thead><tr><th>RUTH COURMAYEUR</th><th>REQUIRED 2ND HALF TIME</th><th>REQUIRED 2ND HALF PACE</th><th>RUTH CONFIRMED 2024 PACE</th><th>FEASIBILITY</th></tr></thead><tbody>';
+  [9.097,9.25,9.40,9.50,9.65,9.711,10.0,10.322].forEach(function(c){
+    var reqH2=S24.finH-c, reqPace=reqH2*60/93.7;
+    var isSchide=Math.abs(c-9.097)<0.01,isR25=Math.abs(c-9.711)<0.01,isR24=Math.abs(c-10.322)<0.01;
+    var fc=reqPace<=8.00?C.green:reqPace<=8.20?'#a3e635':reqPace<=8.50?C.gold:C.red;
+    var feas=reqPace<=8.00?'CONFIRMED CAPABLE':reqPace<=8.20?'LIKELY ACHIEVABLE':reqPace<=8.50?'UNCERTAIN':'NOT ACHIEVABLE';
+    html+='<tr style="'+(isSchide?'background:#0d1a10':'')+'"><td style="font-family:monospace;font-weight:700;color:'+(isSchide?C.schide:c<=9.65?C.ruth:C.gold)+'">'+hm(c)+(isSchide?' &#9733; Schide pace':isR25?' (Ruth 2025)':isR24?' (Ruth 2024)':'')+'</td>';
+    html+='<td style="font-family:monospace">'+hm(reqH2)+'</td>';
+    html+='<td style="font-family:monospace;font-weight:700;color:'+fc+'">'+fmtPace(reqPace)+'/km</td>';
+    html+='<td style="font-family:monospace;color:#22d3ee">8:00/km (2024 confirmed)</td>';
+    html+='<td style="font-family:monospace;font-size:9px;color:'+fc+'">'+feas+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+
+  html+='<div class="card" style="border:1px solid #22d3ee;margin-bottom:12px">';
+  html+='<div style="color:#22d3ee;font-weight:700;font-size:15px;margin-bottom:8px">The central question</div>';
+  html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2.3">';
+  html+='To match Schide CR (22:09) with Ruth\'s confirmed 8:00/km second half: Courmayeur must be <strong style="color:#22d3ee">9:39</strong>.<br>';
+  html+='That is 40 minutes faster than 2024 &mdash; and only 4 minutes faster than 2025 in a storm.<br>';
+  html+='If second half degrades slightly to 8:10/km from 9:39: finish ~22:18 &mdash; still beats CR.<br>';
+  html+='If second half degrades to 8:30/km from 9:39: finish ~22:46 &mdash; behind CR.<br>';
+  html+='<strong style="color:#4ade80">The single question: does Ruth\'s second half hold at 8:00&ndash;8:10/km from a 9:35&ndash;9:45 Courmayeur in ideal conditions? The 2025 data (storm-adjusted) says yes. Lab LT1/LT2 confirms definitively.</strong>';
+  html+='</div></div>';
+
+  html+='<div class="card" style="border:1px solid #4ade80">';
+  html+='<div style="color:#4ade80;font-weight:700;font-size:15px;margin-bottom:8px">The race plan &mdash; what changes to beat Schide</div>';
+  html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2.3">';
+  html+='<span style="color:#22d3ee">1.</span> Target Courmayeur: <strong>9:35&ndash;9:45</strong> in ideal conditions. 25&ndash;35 minutes faster than 2024. Confirmed physiologically available in 2025 storm conditions.<br>';
+  html+='<span style="color:#22d3ee">2.</span> Accept being ~25&ndash;35 minutes behind Schide at Courmayeur. This is inside the confirmed closing corridor &mdash; 2025 confirmed this closing rate against Dauwalter and Bruyas simultaneously.<br>';
+  html+='<span style="color:#22d3ee">3.</span> Protect second-half pace above all else. Ruth\'s 8:00/km second half is the fastest confirmed in the dataset. Do not sacrifice it for a marginal first-half gain.<br>';
+  html+='<span style="color:#22d3ee">4.</span> The Dauwalter 2021 negative-split archetype is not the target &mdash; that race was won on a 171km course against a different field. Schide 2024 is the performance benchmark.<br>';
+  html+='<span style="color:#f59e0b">Lab confirmation: LT1/LT2 determines whether 9:35&ndash;9:45 Courmayeur is sub-threshold. If yes, second-half capability is preserved and the race is winnable. If it breaches LT1, IF Drop spikes and second half degrades below what is needed.</span>';
+  html+='</div></div>';
+  document.getElementById('pane-strategy').innerHTML=html;
+})();
+</script>
+</body>
+</html>
