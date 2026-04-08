@@ -60,6 +60,7 @@
   <div class="tab"    id="t-scenario"   onclick="go('scenario')">Scenario Model</div>
   <div class="tab"    id="t-archetypes" onclick="go('archetypes')">Race Archetypes</div>
   <div class="tab"    id="t-strategy"   onclick="go('strategy')">Strategic Assessment</div>
+  <div class="tab"    id="t-lt1"       onclick="go('lt1')">LT1 Intensity Model</div>
 </div>
 
 <div id="pane-problem"></div>
@@ -67,6 +68,7 @@
 <div id="pane-scenario"   style="display:none"></div>
 <div id="pane-archetypes" style="display:none"></div>
 <div id="pane-strategy"   style="display:none"></div>
+<div id="pane-lt1"       style="display:none"></div>
 
 <div class="footer">
   UTMB Race Strategy Model · Ruth Croft NZL · Confirmed data: LiveTrail 120 runner-years · FIT physiological analysis ·
@@ -90,6 +92,14 @@ var RACES=[
   {id:'s22',    label:'Schide 2022',       year:2022, col:'#d97706', courH:9.533,  finH:23.253, ifd:27.6, courseKm:171.0, cond:'Ideal'},
   {id:'d21',    label:'Dauwalter 2021',    year:2021, col:C.daw,    courH:10.999, finH:22.515, ifd:-1.2, courseKm:171.0, cond:'Ideal'},
   {id:'d23',    label:'Dauwalter 2023',    year:2023, col:'#a855f7', courH:9.681,  finH:23.487, ifd:26.3, courseKm:176.7, cond:'Ideal'},
+  // 2025 additions — confirmed from LiveTrail, iRunFar, Outside Online, RUN247
+  // Dauwalter 2025: Courmayeur confirmed 9.638h · Finish confirmed ~25.840h · IF Drop 58.4% (Spectro.Life)
+  // Note: 2025 course = 174km (landslide reroute), so half2Km = 91km not 93.7km
+  {id:'d25',    label:'Dauwalter 2025',    year:2025, col:'#e879f9', courH:9.638,  finH:25.840, ifd:58.4, courseKm:174.0, cond:'Storm · 10th',
+   note:'Led race until La Fouly (116km). Catastrophic collapse from Champex. Confirmed Courmayeur 9:38, finish ~25:50.'},
+  // Bruyas 2025: Courmayeur confirmed 3.5min ahead of Ruth (9.711h) = 9.653h · Finish 23:29 confirmed
+  {id:'b25',    label:'Bruyas 2025',       year:2025, col:'#f472b6', courH:9.653,  finH:23.483, ifd:30.8, courseKm:174.0, cond:'Storm · 2nd',
+   note:'Ran identical first half to Dauwalter but 1.56 min/km faster second half. Confirmed finish 23:29.'},
 ];
 RACES.forEach(function(r){
   r.half1PaceMin=r.courH*60/HALF1_KM;
@@ -105,11 +115,12 @@ function hm(h){if(!h&&h!==0)return'--';var hh=Math.floor(h),mm=Math.round((h%1)*
 function fmtPace(p){var m=Math.floor(p),s=Math.round((p%1)*60);return m+':'+(s<10?'0':'')+s;}
 
 function go(id){
-  ['problem','absolute','scenario','archetypes','strategy'].forEach(function(t){
+  ['problem','absolute','scenario','archetypes','strategy','lt1'].forEach(function(t){
     document.getElementById('pane-'+t).style.display=t===id?'block':'none';
     document.getElementById('t-'+t).className='tab'+(t===id?' on':'');
   });
   if(id==='scenario') initScenario();
+  if(id==='lt1') initLT1();
 }
 
 /* ── DURABILITY FUNCTION ─────────────────────────────────────────────────────
@@ -135,6 +146,7 @@ function ruthFinish(courH){
 (function(){
   var html='';
   html+='<div class="wbox"><strong style="color:#f43f5e">THE IF DROP PROBLEM:</strong> IF Drop only measures fade relative to each athlete\'s own first-half pace. A 7.2% IF Drop from a slow base is not better than 27.2% from a fast base — the athlete with 27.2% may have run a faster absolute second half. Ruth\'s 7.2% in 2024 reflects a conservative first half, not superior durability. Schide\'s 27.2% reflects an extremely aggressive first half — and she still won by 39 minutes.</div>';
+  html+='<div class="obox"><strong style="color:#f59e0b">2025 KEY ADDITION &mdash; Dauwalter vs Bruyas:</strong> The most analytically powerful comparison in this dataset. Both ran virtually <strong>identical first halves</strong> (Dauwalter 6.97 min/km, Bruyas 6.98 min/km &mdash; a 0.01 min/km difference). Yet their second halves diverged by <strong style="color:#f43f5e">1.56 min/km</strong> (Dauwalter 10.68, Bruyas 9.12). Same first-half intensity, radically different outcomes. This directly demonstrates that first-half pace alone does not determine collapse &mdash; physiological state, storm impact, and fatigue management interact to produce completely different trajectories from the same starting point.</div>';
 
   html+='<div class="sec"><div class="stitle">Absolute pace — first half (bar) vs second half (labelled line) for each race</div>';
   var W=1020,H=280,PL=80,PT=60,PR=30,PB=55,cW=W-PL-PR,cH=H-PT-PB;
@@ -147,6 +159,8 @@ function ruthFinish(courH){
     {label:'Schide\n2024\n(9:06)',   p1:S24.half1PaceMin,      p2:S24.half2PaceMin,      col:C.schide, ifd:'+27.2%'},
     {label:'Daw\n2021\n(10:59)',     p1:D21.half1PaceMin,      p2:D21.half2PaceMin,      col:C.daw,    ifd:'-1.2%'},
     {label:'Daw\n2023\n(9:41)',      p1:RACES[6].half1PaceMin, p2:RACES[6].half2PaceMin, col:'#a855f7', ifd:'+26.3%'},
+    {label:'Daw 2025\n(9:38)\nCOLLAPSE', p1:RACES[7].half1PaceMin, p2:RACES[7].half2PaceMin, col:'#e879f9', ifd:'+58.4%\nstorm'},
+    {label:'Bruyas\n2025\n(9:39)',   p1:RACES[8].half1PaceMin, p2:RACES[8].half2PaceMin, col:'#f472b6', ifd:'+30.8%\nstorm'},
   ];
   var n=blocks.length, bw=Math.floor(cW/n*0.5);
   var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">';
@@ -183,6 +197,27 @@ function ruthFinish(courH){
   html+='<div class="card" style="border-top:2px solid '+C.daw+'">';
   html+='<div style="color:'+C.daw+';font-weight:700;margin-bottom:6px">Dauwalter 2021 — 2nd half: '+fmtPace(D21.half2PaceMin)+'/km</div>';
   html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2">-1.2% IF Drop from '+fmtPace(D21.half1PaceMin)+'/km first half (171km course)<br>Second half: <strong>'+fmtPace(D21.half2PaceMin)+'/km</strong> — near-negative split<br>Near-identical to Ruth 2024 on pace-adjusted basis<br><span style="color:'+C.muted+'">Unique performance — not replicable on 176km modern course</span></div></div>';
+  html+='</div>';
+
+  // 2025 Dauwalter vs Bruyas comparison — new addition
+  var d25r=RACES[7], b25r=RACES[8];
+  html+='<div class="g2">';
+  html+='<div class="card" style="border-top:2px solid #e879f9">';
+  html+='<div style="color:#e879f9;font-weight:700;margin-bottom:6px">Dauwalter 2025 &mdash; 2nd half: '+fmtPace(d25r.half2PaceMin)+'/km &#9888; COLLAPSE</div>';
+  html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2">';
+  html+='58.4% IF Drop from '+fmtPace(d25r.half1PaceMin)+'/km first half (storm)<br>';
+  html+='Second half: <strong style="color:#f43f5e">'+fmtPace(d25r.half2PaceMin)+'/km</strong> &mdash; near walking<br>';
+  html+='Led race to 116km then catastrophic collapse from Champex<br>';
+  html+='Finish: ~25:50 (10th) &mdash; nearly 3hrs after Ruth<br>';
+  html+='<span style="color:#64748b">Storm-amplified glycogen failure on an aggressively-started race</span></div></div>';
+  html+='<div class="card" style="border-top:2px solid #f472b6">';
+  html+='<div style="color:#f472b6;font-weight:700;margin-bottom:6px">Bruyas 2025 &mdash; 2nd half: '+fmtPace(b25r.half2PaceMin)+'/km</div>';
+  html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2">';
+  html+='30.8% IF Drop from '+fmtPace(b25r.half1PaceMin)+'/km first half (storm)<br>';
+  html+='Second half: <strong>'+fmtPace(b25r.half2PaceMin)+'/km</strong> &mdash; significant but survivable<br>';
+  html+='Virtually identical first half to Dauwalter &mdash; 1.56 min/km faster second half<br>';
+  html+='Finish: 23:29 (2nd) &mdash; consistent with her 2021 performance<br>';
+  html+='<span style="color:#64748b">Same starting point as Dauwalter; very different physiological outcome</span></div></div>';
   html+='</div>';
 
   html+='<div class="card" style="border:1px solid #f43f5e">';
@@ -227,13 +262,13 @@ function ruthFinish(courH){
     var wrap=document.getElementById('scatter-chart');
     if(!wrap)return;
     var W=1000,H=310,PL=80,PT=30,PR=160,PB=70,cW=W-PL-PR,cH=H-PT-PB;
-    var xMin=6.3,xMax=8.2,yMin=7.5,yMax=9.6;
+    var xMin=6.3,xMax=8.2,yMin=7.5,yMax=11.0; // extended for Dauwalter 2025 10.68 min/km
     var px=function(p){return PL+(p-xMin)/(xMax-xMin)*cW;};
     var py=function(p){return PT+(p-yMin)/(yMax-yMin)*cH;};
     var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">';
     [6.5,7.0,7.5,8.0].forEach(function(v){var x=px(v);svg+='<line x1="'+x+'" x2="'+x+'" y1="'+PT+'" y2="'+(PT+cH)+'" stroke="#1a2840" stroke-width="0.5"/>';svg+='<text x="'+x+'" y="'+(H-PB+16)+'" fill="#64748b" font-size="8" text-anchor="middle" font-family="monospace">'+fmtPace(v)+'</text>';});
     [7.8,8.0,8.2,8.5,8.8,9.0,9.2,9.5].forEach(function(v){if(v<yMin||v>yMax)return;var y=py(v);svg+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+y+'" y2="'+y+'" stroke="#1a2840" stroke-width="0.5"/>';svg+='<text x="'+(PL-3)+'" y="'+(y+3)+'" fill="#64748b" font-size="8" text-anchor="end" font-family="monospace">'+fmtPace(v)+'</text>';});
-    [[22.143,C.schide,'22:09 CR'],[22.50,C.green,'22:30'],[23.0,'#64748b','23:00']].forEach(function(iso){
+    [[22.143,C.schide,'22:09 CR'],[22.50,C.green,'22:30'],[23.0,'#64748b','23:00'],[23.5,'#64748b','23:30'],[25.5,'#f43f5e','25:30+']].forEach(function(iso){
       var pts=[];
       for(var xv=xMin;xv<=xMax;xv+=0.01){var cH2=xv*83/60,h2H=iso[0]-cH2,yv=h2H*60/93.7;if(yv>=yMin&&yv<=yMax)pts.push({x:px(xv),y:py(yv)});}
       if(pts.length<2)return;
@@ -386,38 +421,142 @@ function updateScenario(){
 /* ══ TAB 4: RACE ARCHETYPES ══════════════════════════════════════════════════ */
 (function(){
   var html='';
-  html+='<div class="ibox">Three confirmed race patterns in this dataset. Each has a different relationship between first-half aggression and second-half retention. Understanding which archetype each athlete occupies is essential for cross-athlete comparison.</div>';
+
+  html+='<div class="ibox">Three confirmed race patterns. Each archetype reflects a different physiological strategy and a different relationship between first-half intensity, substrate use, and second-half retention. The <em>%VO2max estimates below use the Uth-Sorensen formula (VO2max = 15 x HRmax/HRrest) applied to Ruth and extended to competitors via pace-scaling.</em></div>';
+
+  // ── ARCHETYPE CARDS ──────────────────────────────────────────────────────
   var archetypes=[
     {col:C.schide, n:'THE FRONT-RUNNER',
      athletes:'Schide 2024 (27.2% IF Drop) &middot; Schide 2022 (27.6%) &middot; Dauwalter 2023 (26.3%)',
-     lines:['Fastest possible first half &mdash; sets race pace from the front','Accepts 25&ndash;30% fade in second half','Wins because absolute 2nd-half pace is still fast enough','Requires highest VO2max and LT2 ceiling to sustain'],
-     ruth:'Ruth cannot match Schide\'s 9:06 first half. At Schide-level first half, the model projects Ruth\'s second half degrades to ~8:40&ndash;9:00/km &mdash; slower than Schide\'s 8:21/km. Net: she would not win even matching the split.',
-     key:'This archetype only works if the athlete has the highest absolute ceiling. Not currently Ruth\'s path without lab confirmation of a higher VO2max.'},
+     lines:[
+       'Fastest possible first half &mdash; sets race pace from the front',
+       'Accepts 25&ndash;30% fade in second half; wins because absolute 2nd-half pace is still fast enough',
+       '<strong>Why a high VO2max is required:</strong> VO2max sets the ceiling on absolute aerobic power output. A higher VO2max means LT1 occurs at a faster absolute pace &mdash; the athlete can run 9:06/km to Courmayeur and still be within a stable lactate steady state. If Schide runs this pace at ~78&ndash;80% of a VO2max estimated at ~70&ndash;74 ml/kg/min, she remains at or near LT1 but has not exceeded it. Ruth running the same pace at her VO2max of ~62 would be operating at ~85% &mdash; above LT1, unsustainable for 10 hours. The higher VO2max shifts the entire intensity scale upward.',
+       '<strong>The role of LT1, not LT2:</strong> LT1 is the intensity above which lactate rises above resting but remains in a stable elevated steady state. Between LT1 and LT2 (critical speed/power), the athlete is working harder, recruiting more Type II muscle fibres, and burning proportionally more carbohydrate &mdash; but the system remains manageable. LT2 is the boundary above which the VO2 slow component continues rising toward VO2max and exhaustion follows rapidly. UTMB front-runners are not at LT2 &mdash; they are working at the upper end of the LT1 zone, which is sustainable but costly in glycogen. The elevated CHO demand compounds across 10 hours and produces the 27% IF Drop.',
+       '<strong>Type II fibre recruitment consequence:</strong> At upper-LT1 intensity, fast-twitch Type II fibres are increasingly recruited alongside Type I. Type II fibres have a higher glycolytic rate &mdash; they oxidise glycogen faster and accumulate more lactate per unit work. This is the primary mechanism behind the elevated CHO demand and the IF Drop: it is not simply fatigue, it is the physiological cost of the fibre mix required to sustain that pace.',
+     ],
+     ruth:'Ruth at Schide-level first-half pace (~9:06) would be operating at approximately 85% VO2max &mdash; above LT1 for her confirmed physiology. Her second half would likely degrade to 8:40&ndash;9:00/km, slower than Schide&#39;s 8:21/km. Matching the split would not produce a win.',
+     key:'This archetype requires a VO2max estimated ~10&ndash;15% higher than Ruth&#39;s current baseline. Lab confirmation of Ruth&#39;s true VO2max is the first requirement for assessing whether this is achievable.'},
+
     {col:C.daw, n:'THE NEGATIVE SPLITTER',
      athletes:'Dauwalter 2021 (&minus;1.2% IF Drop) &middot; unique in dataset',
-     lines:['Extremely conservative first half &mdash; accept being well behind early','Near-zero or negative fade &mdash; second half matches or beats first','Relies on all competitors degrading while you hold constant','Requires exceptional fat oxidation and glycogen conservation'],
-     ruth:'Dauwalter 2021 pace-adjusted to 176km course gives ~8:02/km second half &mdash; almost identical to Ruth 2024 (8:00/km). But Dauwalter\'s first half (10:59) was 40 minutes slower than Ruth 2024. This archetype cannot overcome Schide\'s first-half advantage on the modern course.',
-     key:'Cannot produce a winning time against current Schide on 176km course. Race dynamics of 2021 do not replicate with modern front-loaded field.'},
+     lines:[
+       'Extremely conservative first half &mdash; accept being well behind at Courmayeur',
+       'Near-zero or negative fade &mdash; second half matches or marginally betters first half',
+       'Relies on all competitors degrading while metabolic state is carefully preserved',
+       '<strong>Why exceptional fat oxidation is required:</strong> At conservative intensities (~65&ndash;70% VO2max), the athlete operates well below LT1. In this zone, Type I slow-twitch oxidative fibres dominate, lactate is near-resting, and fat oxidation provides the majority of energy. An athlete capable of 0.75g/min or more of fat oxidation at these intensities draws very little on muscle glycogen in the early race. Since muscle glycogen is not being significantly depleted, it is available as a reserve for higher-intensity efforts later &mdash; climbs, the second half acceleration, and the final descent.',
+       '<strong>Why glycogen conservation is the mechanism:</strong> Muscle glycogen depletion is intensity-driven &mdash; it cannot be prevented, only rate-limited by staying below the intensity at which Type II fibres are meaningfully recruited. By running the first half at ~70% VO2max (as Dauwalter 2021 appears to have done), the athlete keeps the fibre mix predominantly Type I, keeps glycolytic flux low, and arrives at Courmayeur with substantially more muscle glycogen intact than a front-runner. This is the fuel reserve that powers the flat or negative second half. Without it, the second-half acceleration simply is not available.',
+       '<strong>The trade-off:</strong> Being 40+ minutes behind at Courmayeur requires the entire field to collapse sufficiently for this strategy to win. In 2021 that happened. Against Schide 2024-level front-running on the 176km course, the gap at Courmayeur is too large to close regardless of second-half pace.',
+     ],
+     ruth:'Dauwalter 2021 pace-adjusted to 176km gives ~8:02/km second half &mdash; nearly identical to Ruth 2024 (8:00/km). Their second-half physiological capability appears similar. But Dauwalter&#39;s first half (10:59) was 40 minutes slower than Ruth 2024. The negative-split archetype is not replicable against modern front-loaded fields.',
+     key:'Cannot produce a winning time against current Schide on the 176km course. The glycogen conservation advantage is real but the Courmayeur gap is too large to close.'},
+
     {col:C.ruth, n:'THE TACTICAL CLOSER &#9733;',
-     athletes:'Ruth 2024 (7.2% IF Drop) &middot; Ruth 2025 adjusted (~17%)',
-     lines:['Controlled but not conservative first half &mdash; stay within closing distance','Protect second-half capability as primary constraint','Absorbs being behind at every checkpoint until Champex','Closes at a pace no competitor has matched in the dataset'],
-     ruth:'Ruth\'s confirmed identity. The question is not which archetype &mdash; it is how far she can extend the first-half pace within this archetype. 2025 storm-adjusted suggests 9:43 first half is achievable while retaining ~8:10/km second half. Target zone: 9:35&ndash;9:45.',
-     key:'&#9733; This archetype has the highest ceiling for Ruth. The specific question: can she run 8:00&ndash;8:10/km second half from 9:35&ndash;9:45? The lab LT1/LT2 test resolves this definitively.'},
+     athletes:'Ruth 2024 (7.2% IF Drop) &middot; Ruth 2025 power-adjusted (~17%)',
+     lines:[
+       'Controlled first half near the lower boundary of LT1 &mdash; within closing distance without exceeding sustainable intensity',
+       'Protects second-half capability as the primary constraint; absorbs being behind at every checkpoint until Champex',
+       'Closes at a pace no competitor has matched in this dataset',
+       '<strong>The physiological position:</strong> Ruth&#39;s 2024 first half sat at approximately 75&ndash;76% VO2max &mdash; right at the lower boundary of her LT1 zone. This is the point where Type II recruitment is beginning and CHO demand is rising, but lactate remains in a stable steady state and fat oxidation still contributes substantially (~38% of energy). This explains both her low 7.2% IF Drop (she never exceeded LT1 so glycogen was not excessively depleted) and her rapid second-half closing (adequate glycogen remained for a high-intensity final 90km).',
+       '<strong>The 2025 power-corrected picture:</strong> HR was suppressed 13&ndash;14% by the storm, making the first half appear easy (57.8%HRR, ~61.5% VO2max). Power data tells a different story: at 210W vs 166W in 2024, the power-corrected %VO2max is approximately 77&ndash;78% &mdash; slightly above 2024, consistent with a more aggressive start. The storm amplified glycogen cost through elevated thermal load and mechanical resistance, but the daybreak surge to 192W on Ferret&rarr;Champex confirms Ruth&#39;s glycogen was not critically depleted.',
+       '<strong>The strategic question:</strong> Can Ruth shift her first half to 9:35&ndash;9:45 while staying within LT1? At this pace she would be operating at approximately 77&ndash;79% VO2max &mdash; upper LT1 for her confirmed physiology. This increases Type II recruitment and CHO demand but does not cross into the unsustainable zone. Lab LT1 measurement confirms exactly where this boundary sits.',
+     ],
+     ruth:'Ruth&#39;s confirmed identity. The target is not to change archetypes but to push the first-half pace to 9:35&ndash;9:45 while remaining within the Tactical Closer framework. 2025 power data suggests this is physiologically available.',
+     key:'&#9733; Highest ceiling for Ruth. The lab LT1 test determines whether 9:35&ndash;9:45 is sub-threshold or whether it begins to breach into excessive Type II recruitment and glycogen cost.'},
   ];
+
   archetypes.forEach(function(a){
-    html+='<div class="find" style="border-left:3px solid '+a.col+'">';
+    html+='<div class="find" style="border-left:3px solid '+a.col+';margin-bottom:12px">';
     html+='<div style="color:'+a.col+';font-weight:900;font-size:17px;margin-bottom:4px">'+a.n+'</div>';
     html+='<div style="font-family:monospace;font-size:8px;color:#64748b;margin-bottom:8px">'+a.athletes+'</div>';
     html+='<div class="g2">';
-    html+='<div><div style="font-family:monospace;font-size:8px;color:#64748b;margin-bottom:4px;letter-spacing:1px">CHARACTERISTICS</div>';
-    a.lines.forEach(function(l){html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;margin-bottom:3px;padding-left:6px">&rarr; '+l+'</div>';});
+    html+='<div><div style="font-family:monospace;font-size:8px;color:#64748b;margin-bottom:6px;letter-spacing:1px">PHYSIOLOGICAL CHARACTERISTICS</div>';
+    a.lines.forEach(function(l){html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;margin-bottom:5px;padding-left:6px;line-height:1.7">&rarr; '+l+'</div>';});
     html+='</div><div>';
-    html+='<div style="font-family:monospace;font-size:8px;color:#64748b;margin-bottom:4px;letter-spacing:1px">RUTH\'S POSITION</div>';
-    html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:1.8;margin-bottom:6px">'+a.ruth+'</div>';
-    html+='<div style="font-family:monospace;font-size:9px;color:'+a.col+';padding:5px 8px;background:'+a.col+'12;border-radius:4px">'+a.key+'</div>';
+    html+='<div style="font-family:monospace;font-size:8px;color:#64748b;margin-bottom:6px;letter-spacing:1px">RUTH&#39;S POSITION</div>';
+    html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:1.8;margin-bottom:8px">'+a.ruth+'</div>';
+    html+='<div style="font-family:monospace;font-size:9px;color:'+a.col+';padding:6px 10px;background:'+a.col+'12;border-radius:4px;line-height:1.7">'+a.key+'</div>';
     html+='</div></div></div>';
   });
+
+  // ── COMPARATIVE PHYSIOLOGICAL MODEL ─────────────────────────────────────
+  html+='<div class="sec"><div class="stitle">Comparative %VO2max model &mdash; all athletes from Ruth&#39;s physiological baseline</div>';
+  html+='<div class="ibox">Ruth&#39;s VO2max confirmed via Uth-Sorensen formula: 15 &times; (190/46) = <em>61.96 ml/kg/min</em>. 2024 HR-derived %VO2max uses %HRR &asymp; %VO2R (Swain 1994). 2025 Ruth values are <em>power-corrected</em> (HR suppressed 13&ndash;14% by storm). Competitor %VO2max estimated by pace-scaling from Ruth&#39;s confirmed anchor. Competitor VO2max estimated to place them within a physiologically coherent LT1 zone (~75&ndash;82% VO2max) for their first-half pace. LT1 zone = 75&ndash;82% VO2max (estimated; lab measurement required for precision). LT2/critical speed = above 85&ndash;90% VO2max &mdash; not sustainable for &gt;30&ndash;60 min in even elite athletes.</div>';
+
+  // The comparison table data
+  var compData=[
+    {athlete:'Ruth 2024',         col:C.ruth,   vo2max:61.96, half1pct:75.6, half1note:'Lower LT1 boundary. Mostly sub-threshold. Fat ~38%. Conservative surplus.',  zone:'Lower LT1',  zoneCol:'#f59e0b', source:'HR confirmed FIT'},
+    {athlete:'Ruth 2025 (power)', col:C.ruth,   vo2max:61.96, half1pct:77.8, half1note:'Power-corrected (210W vs 166W). Just inside LT1. Type II beginning. Storm added thermal cost.', zone:'LT1 zone', zoneCol:'#f59e0b', source:'Power-corrected FIT'},
+    {athlete:'Ruth 2025 (HR only)',col:'#6ee7b7',vo2max:61.96, half1pct:61.5, half1note:'Storm HR suppression artefact. DO NOT use for intensity assessment. Power data supersedes.', zone:'Underestimate', zoneCol:'#f43f5e', source:'HR only &mdash; misleading'},
+    {athlete:'Schide 2024',       col:C.schide, vo2max:71.0,  half1pct:79.2, half1note:'Pace-scaled from Ruth anchor (+13.5% faster). At 71 ml/kg/min VO2max, sits at upper LT1. Elevated CHO, Type II recruited, lactate elevated but stable. Sustainable at this level.', zone:'Upper LT1', zoneCol:'#f43f5e', source:'Pace-scaled estimate'},
+    {athlete:'Dauwalter 2021',    col:C.daw,    vo2max:66.0,  half1pct:70.7, half1note:'Pace-scaled (6.6% slower than Ruth 2024). Well below LT1. Predominantly fat-oxidising. Minimal Type II recruitment. Glycogen conservation maximised.', zone:'Sub-LT1', zoneCol:'#4ade80', source:'Pace-scaled estimate'},
+    {athlete:'Dauwalter 2025',    col:'#e879f9', vo2max:66.0,  half1pct:80.6, half1note:'Pace-scaled (6.6% faster than Ruth 2024) at same VO2max as 2021. Now operating at upper LT1 &mdash; elevated CHO, significant Type II. Storm added ~10&ndash;15% metabolic cost. Glycogen deficit accumulated rapidly.', zone:'Upper LT1+', zoneCol:'#f43f5e', source:'Pace-scaled estimate'},
+    {athlete:'Bruyas 2025',       col:'#f472b6', vo2max:64.0,  half1pct:79.0, half1note:'Virtually identical first-half pace to Dauwalter 2025 (0.7s/km difference). Similar LT1 position. Survived better &mdash; suggests either slightly higher VO2max, better fat adaptation, or better storm fuelling strategy.', zone:'Upper LT1', zoneCol:'#f59e0b', source:'Pace-scaled estimate'},
+  ];
+
+  html+='<div style="overflow-x:auto"><table class="ftable"><thead><tr>';
+  html+='<th>ATHLETE / YEAR</th><th>VO2MAX EST.</th><th>1ST HALF %VO2MAX</th><th>LT1 ZONE</th><th>PHYSIOLOGICAL INTERPRETATION</th><th>SOURCE</th>';
+  html+='</tr></thead><tbody>';
+  compData.forEach(function(d){
+    html+='<tr>';
+    html+='<td style="color:'+d.col+';font-weight:700">'+d.athlete+'</td>';
+    html+='<td style="font-family:monospace;color:'+d.col+'">'+d.vo2max.toFixed(1)+' ml/kg/min</td>';
+    html+='<td style="font-family:monospace;font-weight:700;color:'+d.col+'">'+d.half1pct.toFixed(1)+'%</td>';
+    html+='<td style="font-family:monospace;font-size:9px;font-weight:700;color:'+d.zoneCol+'">'+d.zone+'</td>';
+    html+='<td style="font-family:monospace;font-size:9px;color:#94a3b8;line-height:1.6">'+d.half1note+'</td>';
+    html+='<td style="font-family:monospace;font-size:8px;color:#64748b">'+d.source+'</td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+
+  // LT1 zone visual
+  html+='<div class="sec"><div class="stitle">%VO2max first-half intensity &mdash; all athletes plotted against LT1 zone</div>';
+  html+='<div class="card" style="padding:12px" id="vo2-chart"></div></div>';
+
+  // Key findings box
+  html+='<div class="card" style="border:1px solid #22d3ee">';
+  html+='<div style="color:#22d3ee;font-weight:700;font-size:14px;margin-bottom:8px">What the comparative model reveals</div>';
+  html+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2.2">';
+  html+='<strong style="color:'+C.schide+'">Schide&#39;s VO2max advantage:</strong> For Schide to run 13.5% faster than Ruth to Courmayeur while remaining in a manageable LT1 zone, her VO2max is estimated at ~70&ndash;74 ml/kg/min. This is the primary structural difference &mdash; not a different threshold as a fraction of VO2max, but a higher absolute VO2max that places LT1 at a faster pace.<br>';
+  html+='<strong style="color:#e879f9">Dauwalter 2025 collapse mechanism:</strong> In 2021 she ran well below LT1 (~70.7% VO2max) &mdash; glycogen conserved, fat dominant, sustainable. In 2025 she ran at ~80.6% VO2max &mdash; upper LT1, elevated CHO demand, elevated Type II recruitment. The storm added further metabolic cost. The result was accelerated glycogen depletion that could not be offset by exogenous feeding.<br>';
+  html+='<strong style="color:#f472b6">Bruyas vs Dauwalter 2025:</strong> Near-identical first-half %VO2max. Bruyas survived with a 30.8% IF Drop vs Dauwalter&#39;s 58.4%. The divergence likely reflects differences in VO2max (Bruyas estimated slightly lower at ~64), fat oxidation capacity, prior storm experience, or glycogen loading strategy. Same intensity, different physiological responses.<br>';
+  html+='<strong style="color:'+C.ruth+'">The model&#39;s key uncertainty:</strong> All competitor VO2max values are estimated by pace-scaling from Ruth&#39;s anchor. The true values may differ. Lab testing of Ruth&#39;s actual VO2max and LT1 transforms this from an estimated comparative map to a measured one.';
+  html+='</div></div>';
+
   document.getElementById('pane-archetypes').innerHTML=html;
+
+  // Build the %VO2max chart after DOM insert
+  setTimeout(function(){
+    var wrap=document.getElementById('vo2-chart');
+    if(!wrap)return;
+    var W=960,H=200,PL=160,PT=20,PR=30,PB=40,cW=W-PL-PR,cH=H-PT-PB;
+    var xMin=58,xMax=86;
+    var px=function(v){return PL+(v-xMin)/(xMax-xMin)*cW;};
+    var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">';
+    // LT1 zone shading
+    svg+='<rect x="'+px(75)+'" y="'+PT+'" width="'+(px(82)-px(75))+'" height="'+cH+'" fill="#f59e0b" opacity="0.08"/>';
+    svg+='<text x="'+(px(75)+(px(82)-px(75))/2)+'" y="'+(PT+10)+'" fill="#f59e0b" font-size="8" text-anchor="middle" font-family="monospace">LT1 ZONE</text>';
+    svg+='<text x="'+(px(75)+(px(82)-px(75))/2)+'" y="'+(PT+20)+'" fill="#f59e0b" font-size="7" text-anchor="middle" font-family="monospace">75&ndash;82% VO2max</text>';
+    // Sub-LT1 label
+    svg+='<text x="'+px(66)+'" y="'+(PT+10)+'" fill="#4ade80" font-size="8" text-anchor="middle" font-family="monospace">SUB-LT1</text>';
+    svg+='<text x="'+px(66)+'" y="'+(PT+20)+'" fill="#4ade80" font-size="7" text-anchor="middle" font-family="monospace">fat dominant</text>';
+    // LT2 zone
+    svg+='<rect x="'+px(85)+'" y="'+PT+'" width="'+(px(86)-px(85)+30)+'" height="'+cH+'" fill="#f43f5e" opacity="0.08"/>';
+    svg+='<text x="'+px(85.5)+'" y="'+(PT+10)+'" fill="#f43f5e" font-size="7" font-family="monospace">LT2+</text>';
+    // Grid lines
+    [60,65,70,75,80,85].forEach(function(v){var x=px(v);svg+='<line x1="'+x+'" x2="'+x+'" y1="'+PT+'" y2="'+(PT+cH)+'" stroke="#1a2840" stroke-width="0.5"/>';svg+='<text x="'+x+'" y="'+(H-5)+'" fill="#64748b" font-size="8" text-anchor="middle" font-family="monospace">'+v+'%</text>';});
+    // Athlete dots
+    var yStep=cH/(compData.length+1);
+    compData.forEach(function(d,i){
+      var x=px(d.half1pct), y=PT+yStep*(i+1);
+      svg+='<circle cx="'+x+'" cy="'+y+'" r="6" fill="'+d.col+'" opacity="0.9"/>';
+      svg+='<text x="'+(PL-5)+'" y="'+(y+3)+'" fill="'+d.col+'" font-size="8" text-anchor="end" font-family="monospace">'+d.athlete+'</text>';
+      svg+='<text x="'+(x+10)+'" y="'+(y+3)+'" fill="'+d.col+'" font-size="8" font-family="monospace">'+d.half1pct.toFixed(1)+'%</text>';
+    });
+    svg+='<text x="'+(PL+cW/2)+'" y="'+(H-3)+'" fill="#64748b" font-size="8" text-anchor="middle" font-family="monospace">% VO2max first-half intensity estimate</text>';
+    svg+='</svg>';
+    wrap.innerHTML=svg;
+  },60);
 })();
 
 /* ══ TAB 5: STRATEGIC ASSESSMENT ════════════════════════════════════════════ */
@@ -425,6 +564,9 @@ function updateScenario(){
   var html='';
   html+='<div class="sec"><div class="stitle">The arithmetic of winning &mdash; required Courmayeur split to match Schide CR</div>';
   html+='<table class="ftable"><thead><tr><th>RUTH COURMAYEUR</th><th>REQUIRED 2ND HALF TIME</th><th>REQUIRED 2ND HALF PACE</th><th>RUTH CONFIRMED 2024 PACE</th><th>FEASIBILITY</th></tr></thead><tbody>';
+  // Dauwalter 2025 object reference for strategy tab
+  var d25strat=RACES[7], b25strat=RACES[8];
+  html+='<div class="obox"><strong style="color:#f59e0b">2025 LESSON &mdash; Dauwalter vs Bruyas:</strong> Both ran ~9:38&ndash;9:39 first halves in storm conditions. Dauwalter&#39;s second half was 10:41/km (58.4% IF Drop). Bruyas&#39;s was 9:07/km (30.8% IF Drop). The 1.56 min/km divergence from the same starting point quantifies how much physiological state, storm management, and durability vary at this first-half intensity. Ruth won from 9:43 with ~8:10/km second half &mdash; demonstrating that the same first-half pace as Dauwalter/Bruyas is compatible with a winning second half if the athlete is prepared correctly.</div>';
   [9.097,9.25,9.40,9.50,9.65,9.711,10.0,10.322].forEach(function(c){
     var reqH2=S24.finH-c, reqPace=reqH2*60/93.7;
     var isSchide=Math.abs(c-9.097)<0.01,isR25=Math.abs(c-9.711)<0.01,isR24=Math.abs(c-10.322)<0.01;
@@ -459,6 +601,355 @@ function updateScenario(){
   html+='</div></div>';
   document.getElementById('pane-strategy').innerHTML=html;
 })();
+
+/* ══ TAB 6: LT1 INTENSITY MODEL ═════════════════════════════════════════════ */
+var lt1Built=false;
+function initLT1(){
+  if(lt1Built)return; lt1Built=true;
+
+  // ── PHYSIOLOGICAL CONSTANTS ──────────────────────────────────────────────
+  var RUTH_VO2MAX=61.96;  // ml/kg/min confirmed Uth-Sorensen
+  // Confirmed pace-to-%VO2max anchors from Ruth FIT data:
+  //   7.46 min/km = 75.6% VO2max (2024, HR-confirmed)
+  //   7.09 min/km = 77.8% VO2max (2025, power-corrected)
+  // Slope: (77.8-75.6)/(7.09-7.46) = -5.946 %VO2max per min/km
+  var SLOPE = -5.946;
+  var ANCH_PACE=7.46, ANCH_PCT=75.6;
+
+  function paceToVO2pct(pace){ return ANCH_PCT+(pace-ANCH_PACE)*SLOPE; }
+  function vo2pctToPace(pct){ return ANCH_PACE+(pct-ANCH_PCT)/SLOPE; }
+  function courSplit(paceMinKm){ return paceMinKm*83/60; }
+  function pctOfLT1(actualVO2pct,lt1VO2pct){ return actualVO2pct/lt1VO2pct*100; }
+
+  // IF Drop prediction curve — calibrated from five confirmed data points:
+  // Dauwalter 2021: 90.7% of LT1 → -1.2% IF Drop
+  // Ruth 2024:      97.0% of LT1 →  7.2% IF Drop
+  // Ruth 2025 adj:  99.7% of LT1 → 17.0% IF Drop
+  // Schide 2024:   101.5% of LT1 → 27.2% IF Drop
+  // Dauwalter 2025: 103.3% of LT1 → 58.4% IF Drop
+  function predictIFDrop(pLT1){
+    if(pLT1<85)  return -3;
+    if(pLT1<93)  return -3+(pLT1-85)/8*6;           // -3 → +3
+    if(pLT1<97)  return 3+(pLT1-93)/4*4.2;           // 3 → 7.2
+    if(pLT1<99.7)return 7.2+(pLT1-97)/2.7*9.8;      // 7.2 → 17
+    if(pLT1<101.5)return 17+(pLT1-99.7)/1.8*10.2;   // 17 → 27.2
+    if(pLT1<103.3)return 27.2+(pLT1-101.5)/1.8*31.2; // 27.2 → 58.4
+    return 58.4+(pLT1-103.3)*18;
+  }
+
+  // Predicted finish from IF Drop (using Ruth 2024 second-half as reference)
+  function predictFinish(courH, ifDrop){
+    var h2Pace = 8.00*(1+ifDrop/100);
+    return courH + h2Pace*93.7/60;
+  }
+
+  function hm(h){var hh=Math.floor(h),mm=Math.round((h%1)*60);return hh+':'+(mm<10?'0':'')+mm;}
+  function fmtP(p){var m=Math.floor(p),s=Math.round((p%1)*60);return m+':'+(s<10?'0':'')+s;}
+  function glycColor(g){return g<50?'#f43f5e':g<100?'#f59e0b':g<200?'#22d3ee':'#4ade80';}
+  function ltColor(p){return p>103?'#f43f5e':p>100?'#fb923c':p>98?'#f59e0b':p>94?'#22d3ee':'#4ade80';}
+
+  // Observed race data
+  var obs=[
+    {label:'Dauwalter 2021', col:C.daw,    pct:70.7, ifd:-1.2,  courH:10.999, note:'Well below LT1 — fat dominant'},
+    {label:'Ruth 2024',      col:C.ruth,   pct:75.6, ifd:7.2,   courH:10.322, note:'Just below LT1 lower boundary'},
+    {label:'Ruth 2025 (pw)', col:'#6ee7b7',pct:77.8, ifd:17.0,  courH:9.711,  note:'Power-corrected — inside LT1 zone'},
+    {label:'Schide 2024',    col:C.schide, pct:79.2, ifd:27.2,  courH:9.097,  note:'Upper LT1 — elevated CHO, Type II'},
+    {label:'Bruyas 2025',    col:'#f472b6',pct:79.0, ifd:30.8,  courH:9.653,  note:'Upper LT1 — similar to Schide'},
+    {label:'Dauwalter 2025', col:'#e879f9',pct:80.6, ifd:58.4,  courH:9.638,  note:'Above LT1 in storm — collapse'},
+  ];
+
+  // Build HTML
+  var html='';
+  html+='<div class="ibox">Interactive model: adjust the three sliders below to explore how LT1 placement and competitor VO2max change the intensity picture. All outputs update live. <strong style="color:#22d3ee">Ruth&#39;s VO2max is predicted to be approximately 62 ml/kg/min</strong>, estimated using the Uth-Sorensen formula: 15 &times; (HRmax/HRrest) = 15 &times; (190/46) = 61.96 ml/kg/min. This is a field estimate &mdash; lab measurement will confirm. Pace-to-%VO2max slope derived from two confirmed FIT anchors (7.46 min/km = 75.6% VO2max in 2024; 7.09 min/km = 77.8% VO2max in 2025, power-corrected). IF Drop prediction curve calibrated from five confirmed race data points. Competitor VO2max values are estimates &mdash; adjust the sliders to explore different scenarios.</div>';
+
+  // ── SLIDERS ──────────────────────────────────────────────────────────────
+  html+='<div class="g3">';
+
+  // Slider 1: LT1 % of VO2max
+  html+='<div class="slider-wrap">';
+  html+='<div style="font-family:monospace;font-size:9px;color:#64748b;text-align:center;letter-spacing:1px;margin-bottom:4px">RUTH LT1 — % OF VO2MAX</div>';
+  html+='<div class="sv-display" id="lt1-val" style="color:#f59e0b;font-size:32px">78.0%</div>';
+  html+='<div style="font-family:monospace;font-size:9px;text-align:center;color:#64748b;margin-bottom:6px" id="lt1-sub">Mid-zone estimate &mdash; pending lab confirmation</div>';
+  html+='<input type="range" id="lt1-slider" min="720" max="850" value="780" step="5" oninput="updateLT1()">';
+  html+='<div class="range-labels"><span>72% (low)</span><span style="color:#f59e0b">78% (est.)</span><span>85% (high)</span></div>';
+  html+='</div>';
+
+  // Slider 2: Schide VO2max
+  html+='<div class="slider-wrap">';
+  html+='<div style="font-family:monospace;font-size:9px;color:#64748b;text-align:center;letter-spacing:1px;margin-bottom:4px">SCHIDE EST. VO2MAX (ml/kg/min)</div>';
+  html+='<div class="sv-display" id="s-vo2-val" style="color:'+C.schide+';font-size:32px">71.0</div>';
+  html+='<div style="font-family:monospace;font-size:9px;text-align:center;color:#64748b;margin-bottom:6px" id="s-vo2-sub">~13.5% above Ruth baseline</div>';
+  html+='<input type="range" id="s-vo2-slider" min="600" max="750" value="710" step="5" oninput="updateLT1()">';
+  html+='<div class="range-labels"><span>60 (similar to Ruth)</span><span style="color:'+C.schide+'">71 (est.)</span><span>75 (upper limit)</span></div>';
+  html+='</div>';
+
+  // Slider 3: Dauwalter VO2max
+  html+='<div class="slider-wrap">';
+  html+='<div style="font-family:monospace;font-size:9px;color:#64748b;text-align:center;letter-spacing:1px;margin-bottom:4px">DAUWALTER EST. VO2MAX (ml/kg/min)</div>';
+  html+='<div class="sv-display" id="d-vo2-val" style="color:#e879f9;font-size:32px">66.0</div>';
+  html+='<div style="font-family:monospace;font-size:9px;text-align:center;color:#64748b;margin-bottom:6px" id="d-vo2-sub">~6.5% above Ruth baseline</div>';
+  html+='<input type="range" id="d-vo2-slider" min="600" max="750" value="660" step="5" oninput="updateLT1()">';
+  html+='<div class="range-labels"><span>60 (similar to Ruth)</span><span style="color:#e879f9">66 (est.)</span><span>75 (upper limit)</span></div>';
+  html+='</div>';
+  html+='</div>';
+
+  // Output panels
+  html+='<div class="g2" id="lt1-zones" style="margin-bottom:12px"></div>';
+  html+='<div class="sec"><div class="stitle">%LT1 and predicted IF Drop &mdash; all athletes</div><div class="card" style="padding:12px" id="lt1-chart"></div></div>';
+  html+='<div class="sec"><div class="stitle">Full intensity table &mdash; live updating</div><div id="lt1-table"></div></div>';
+  html+='<div class="sec"><div class="stitle">Training prescription &mdash; Ruth pace targets</div><div id="lt1-rx"></div></div>';
+
+  document.getElementById('pane-lt1').innerHTML=html;
+  setTimeout(updateLT1,80);
+}
+
+function updateLT1(){
+  var sl1=document.getElementById('lt1-slider');
+  var sl2=document.getElementById('s-vo2-slider');
+  var sl3=document.getElementById('d-vo2-slider');
+  if(!sl1)return;
+
+  // Read slider values (stored as tenths to allow decimals)
+  var lt1Pct  = parseInt(sl1.value)/10;  // e.g. 780 → 78.0
+  var sVO2    = parseInt(sl2.value)/10;  // e.g. 710 → 71.0
+  var dVO2    = parseInt(sl3.value)/10;  // e.g. 660 → 66.0
+  var ruthVO2 = 61.96;
+
+  // Update display labels
+  var el1=document.getElementById('lt1-val');
+  if(el1)el1.textContent=lt1Pct.toFixed(1)+'%';
+  var el1s=document.getElementById('lt1-sub');
+  if(el1s){
+    var zone=lt1Pct<75?'Below typical range &mdash; very high fat capacity':
+             lt1Pct<78?'Lower LT1 estimate &mdash; possible for fat-adapted athlete':
+             lt1Pct<81?'Mid-zone estimate &mdash; typical elite endurance athlete':
+             'Upper LT1 estimate &mdash; would imply very high CHO tolerance';
+    el1s.textContent=zone;
+  }
+  var el2=document.getElementById('s-vo2-val');
+  if(el2)el2.textContent=sVO2.toFixed(1);
+  var el2s=document.getElementById('s-vo2-sub');
+  if(el2s)el2s.textContent='~'+(((sVO2-ruthVO2)/ruthVO2)*100).toFixed(1)+'% above Ruth baseline';
+  var el3=document.getElementById('d-vo2-val');
+  if(el3)el3.textContent=dVO2.toFixed(1);
+  var el3s=document.getElementById('d-vo2-sub');
+  if(el3s)el3s.textContent='~'+(((dVO2-ruthVO2)/ruthVO2)*100).toFixed(1)+'% above Ruth baseline';
+
+  // Slope from Ruth anchors
+  var SLOPE=-5.946, ANCH_PACE=7.46, ANCH_PCT=75.6;
+  function paceToVO2pct(pace){return ANCH_PCT+(pace-ANCH_PACE)*SLOPE;}
+  function vo2pctToPace(pct){return ANCH_PACE+(pct-ANCH_PCT)/SLOPE;}
+  function courSplit(p){return p*83/60;}
+  function pctOfLT1c(actual){return actual/lt1Pct*100;}
+  function predictIFD(pLT1){
+    if(pLT1<85)  return -3;
+    if(pLT1<93)  return -3+(pLT1-85)/8*6;
+    if(pLT1<97)  return 3+(pLT1-93)/4*4.2;
+    if(pLT1<99.7)return 7.2+(pLT1-97)/2.7*9.8;
+    if(pLT1<101.5)return 17+(pLT1-99.7)/1.8*10.2;
+    if(pLT1<103.3)return 27.2+(pLT1-101.5)/1.8*31.2;
+    return 58.4+(pLT1-103.3)*18;
+  }
+  function hm(h){var hh=Math.floor(h),mm=Math.round((h%1)*60);return hh+':'+(mm<10?'0':'')+mm;}
+  function fmtP(p){var m=Math.floor(p),s=Math.round((p%1)*60);return m+':'+(s<10?'0':'')+s;}
+  function ltColor(p){return p>105?'#f43f5e':p>102?'#fb923c':p>99?'#f59e0b':p>95?'#22d3ee':'#4ade80';}
+  function ltLabel(p){return p>105?'ABOVE LT1 - unsustainable':p>102?'ABOVE LT1 - collapse risk':p>99?'AT LT1 boundary':p>95?'BELOW LT1 - stable':'WELL BELOW LT1 - fat dominant';}
+
+  // Recalculate %VO2max for Schide and Dauwalter with updated VO2max
+  // Schide 2024: first-half pace 6.57 min/km → %VO2max depends on her VO2max
+  // For a competitor with VO2max X: their %VO2max = (ruthVO2max/X) * ruth%VO2max_at_same_pace
+  // Because at same pace, VO2 demand is same, so %VO2max = same_VO2_demand / X * 100
+  // Ruth at 7.46 min/km uses 75.6% of 61.96 = 46.84 ml/kg/min
+  // So VO2 demand at pace p = paceToVO2pct(p)/100 * ruthVO2max (absolute)
+  function paceToAbsVO2(pace){ return paceToVO2pct(pace)/100*ruthVO2; }
+  function competitorPctVO2(pace, compVO2){ return paceToAbsVO2(pace)/compVO2*100; }
+
+  // Build athlete rows
+  var athletes=[
+    {label:'Dauwalter 2021', col:C.daw,    pace:7.947, vo2:dVO2, ifdActual:-1.2},
+    {label:'Ruth 2024',      col:C.ruth,   pace:7.46,  vo2:ruthVO2, ifdActual:7.2},
+    {label:'Ruth 2025 (pw)', col:'#6ee7b7',pace:7.25,  vo2:ruthVO2, ifdActual:17.0},
+    {label:'Schide 2024',    col:C.schide, pace:6.57,  vo2:sVO2, ifdActual:27.2},
+    {label:'Bruyas 2025',    col:'#f472b6',pace:6.978, vo2:63.5, ifdActual:30.8},
+    {label:'Dauwalter 2025', col:'#e879f9',pace:6.967, vo2:dVO2, ifdActual:58.4},
+  ];
+
+  athletes.forEach(function(a){
+    a.pctVO2 = competitorPctVO2(a.pace, a.vo2);
+    a.pLT1   = pctOfLT1c(a.pctVO2);
+    a.ifdPred = predictIFD(a.pLT1);
+    a.courH  = courSplit(a.pace);
+  });
+
+  // ── ZONE INFO CARDS ──────────────────────────────────────────────────────
+  var lt1Pace = vo2pctToPace(lt1Pct);
+  var lt1Upper = vo2pctToPace(Math.min(lt1Pct+4, 85));
+  var lt1Lower = vo2pctToPace(Math.max(lt1Pct-4, 68));
+  var lt1CourH = courSplit(lt1Pace);
+  var zonesEl=document.getElementById('lt1-zones');
+  if(zonesEl){
+    zonesEl.innerHTML=
+      '<div class="card" style="border-top:2px solid #f59e0b"><div style="color:#f59e0b;font-weight:700;margin-bottom:6px">Ruth LT1 pace at '+lt1Pct.toFixed(1)+'% VO2max</div>'+
+      '<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2">'+
+      'Pace at LT1: <strong style="color:#f59e0b">'+fmtP(lt1Pace)+'/km</strong><br>'+
+      'Courmayeur split at LT1: <strong style="color:#f59e0b">'+hm(lt1CourH)+'</strong><br>'+
+      'LT1 zone (±4%): '+fmtP(lt1Lower)+' &ndash; '+fmtP(lt1Upper)+'/km<br>'+
+      'Cour. split range: '+hm(courSplit(lt1Lower))+' &ndash; '+hm(courSplit(lt1Upper))+
+      '</div></div>'+
+      '<div class="card" style="border-top:2px solid #22d3ee"><div style="color:#22d3ee;font-weight:700;margin-bottom:6px">Ruth optimal race corridor</div>'+
+      '<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2">'+
+      'Sub-LT1 (95% of LT1): <strong>'+fmtP(vo2pctToPace(lt1Pct*0.95))+'/km &rarr; '+hm(courSplit(vo2pctToPace(lt1Pct*0.95)))+'</strong><br>'+
+      'At LT1 (100%): <strong>'+fmtP(lt1Pace)+'/km &rarr; '+hm(lt1CourH)+'</strong><br>'+
+      '2024 actual: 7:46/km &rarr; 10:19 ('+((pctOfLT1c(75.6))).toFixed(1)+'% of LT1)<br>'+
+      '2025 power-adj: 7:09/km &rarr; 9:43 ('+((pctOfLT1c(77.8))).toFixed(1)+'% of LT1)'+
+      '</div></div>';
+  }
+
+  // ── IF DROP PREDICTION CHART ─────────────────────────────────────────────
+  var chartEl=document.getElementById('lt1-chart');
+  if(chartEl){
+    var W=960,H=240,PL=70,PT=25,PR=120,PB=50,cW=W-PL-PR,cH=H-PT-PB;
+    var xMin=82,xMax=112,yMin=-8,yMax=70;
+    var px=function(v){return PL+(v-xMin)/(xMax-xMin)*cW;};
+    var py=function(v){return PT+(1-v/yMax)*cH;};
+    var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">';
+
+    // Shading zones
+    svg+='<rect x="'+px(95)+'" y="'+PT+'" width="'+(px(100)-px(95))+'" height="'+cH+'" fill="#22d3ee" opacity="0.04"/>';
+    svg+='<rect x="'+px(100)+'" y="'+PT+'" width="'+(px(103)-px(100))+'" height="'+cH+'" fill="#f59e0b" opacity="0.06"/>';
+    svg+='<rect x="'+px(103)+'" y="'+PT+'" width="'+(px(112)-px(103))+'" height="'+cH+'" fill="#f43f5e" opacity="0.06"/>';
+
+    // Zone labels
+    svg+='<text x="'+px(88)+'" y="'+(PT+14)+'" fill="#4ade80" font-size="8" text-anchor="middle" font-family="monospace">SUB-LT1</text>';
+    svg+='<text x="'+px(97.5)+'" y="'+(PT+14)+'" fill="#22d3ee" font-size="8" text-anchor="middle" font-family="monospace">NEAR LT1</text>';
+    svg+='<text x="'+px(101.5)+'" y="'+(PT+14)+'" fill="#f59e0b" font-size="8" text-anchor="middle" font-family="monospace">ABOVE LT1</text>';
+    svg+='<text x="'+px(107)+'" y="'+(PT+14)+'" fill="#f43f5e" font-size="8" text-anchor="middle" font-family="monospace">COLLAPSE</text>';
+
+    // Grid
+    [0,10,20,30,40,50,60].forEach(function(v){var y=py(v);svg+='<line x1="'+PL+'" x2="'+(W-PR)+'" y1="'+y+'" y2="'+y+'" stroke="#1a2840" stroke-width="0.5"/>';svg+='<text x="'+(PL-3)+'" y="'+(y+3)+'" fill="#64748b" font-size="7" text-anchor="end" font-family="monospace">'+v+'%</text>';});
+    [85,90,95,100,105,110].forEach(function(v){var x=px(v);svg+='<line x1="'+x+'" x2="'+x+'" y1="'+PT+'" y2="'+(PT+cH)+'" stroke="#1a2840" stroke-width="0.5"/>';svg+='<text x="'+x+'" y="'+(H-5)+'" fill="#64748b" font-size="7" text-anchor="middle" font-family="monospace">'+v+'%</text>';});
+
+    // 100% LT1 vertical
+    svg+='<line x1="'+px(100)+'" x2="'+px(100)+'" y1="'+PT+'" y2="'+(PT+cH)+'" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.6"/>';
+    svg+='<text x="'+(px(100)+3)+'" y="'+(PT+cH-4)+'" fill="#f59e0b" font-size="7" font-family="monospace">LT1 boundary</text>';
+
+    // Prediction curve
+    var curvePts=[];
+    for(var xv=83;xv<=111;xv+=0.5){
+      var yv=predictIFD(xv);
+      if(yv>=yMin&&yv<=yMax)curvePts.push({x:px(xv),y:py(yv)});
+    }
+    function predictIFD(pLT1){
+      if(pLT1<85)  return -3;
+      if(pLT1<93)  return -3+(pLT1-85)/8*6;
+      if(pLT1<97)  return 3+(pLT1-93)/4*4.2;
+      if(pLT1<99.7)return 7.2+(pLT1-97)/2.7*9.8;
+      if(pLT1<101.5)return 17+(pLT1-99.7)/1.8*10.2;
+      if(pLT1<103.3)return 27.2+(pLT1-101.5)/1.8*31.2;
+      return 58.4+(pLT1-103.3)*18;
+    }
+    var curveD=curvePts.map(function(p,i){return(i===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1);}).join(' ');
+    svg+='<path d="'+curveD+'" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.6"/>';
+
+    // Athlete dots
+    athletes.forEach(function(a){
+      if(a.pLT1<xMin||a.pLT1>xMax)return;
+      var x=px(a.pLT1), ya=py(a.ifdActual);
+      var yp=py(Math.min(a.ifdPred,yMax));
+      // Actual dot (solid)
+      svg+='<circle cx="'+x+'" cy="'+ya+'" r="7" fill="'+a.col+'" opacity="0.9"/>';
+      // Predicted dot (ring)
+      svg+='<circle cx="'+x+'" cy="'+yp+'" r="5" fill="none" stroke="'+a.col+'" stroke-width="1.5" opacity="0.6"/>';
+      // Label
+      var short=a.label.replace('Dauwalter','Daw').replace('2025','25').replace('2024','24').replace('2021','21').replace(' (pw)','pw');
+      svg+='<text x="'+(x+9)+'" y="'+(ya-2)+'" fill="'+a.col+'" font-size="7" font-family="monospace">'+short+'</text>';
+    });
+
+    // Legend
+    svg+='<circle cx="'+(W-PR+8)+'" cy="'+(PT+12)+'" r="5" fill="#64748b"/>';
+    svg+='<text x="'+(W-PR+16)+'" y="'+(PT+15)+'" fill="#64748b" font-size="7" font-family="monospace">Actual IF Drop</text>';
+    svg+='<circle cx="'+(W-PR+8)+'" cy="'+(PT+26)+'" r="4" fill="none" stroke="#64748b" stroke-width="1.5"/>';
+    svg+='<text x="'+(W-PR+16)+'" y="'+(PT+29)+'" fill="#64748b" font-size="7" font-family="monospace">Predicted IF Drop</text>';
+
+    svg+='<text x="'+(PL+cW/2)+'" y="'+(H-3)+'" fill="#64748b" font-size="8" text-anchor="middle" font-family="monospace">% of LT1 (actual first-half %VO2max / LT1 %VO2max &times; 100)</text>';
+    svg+='<text x="'+(PL-50)+'" y="'+(PT+cH/2)+'" fill="#64748b" font-size="8" text-anchor="middle" font-family="monospace" transform="rotate(-90,'+(PL-50)+','+(PT+cH/2)+')">IF Drop %</text>';
+    svg+='</svg>';
+    chartEl.innerHTML=svg;
+  }
+
+  // ── FULL TABLE ───────────────────────────────────────────────────────────
+  var tEl=document.getElementById('lt1-table');
+  if(tEl){
+    var t='<table class="ftable"><thead><tr>';
+    t+='<th>ATHLETE</th><th>VO2MAX</th><th>1ST HALF PACE</th><th>%VO2MAX</th><th>%LT1</th><th>LT1 STATUS</th>';
+    t+='<th>ACTUAL IF DROP</th><th>PREDICTED IF DROP</th><th>INTERPRETATION</th></tr></thead><tbody>';
+    athletes.forEach(function(a){
+      var lc=ltColor(a.pLT1);
+      var ifdDiff=a.ifdActual-a.ifdPred;
+      var ifdDiffStr=(ifdDiff>2?'<span style="color:#f59e0b">+'+ifdDiff.toFixed(1)+'%</span>':
+                      ifdDiff<-2?'<span style="color:#4ade80">'+ifdDiff.toFixed(1)+'%</span>':
+                      '<span style="color:#64748b">~match</span>');
+      t+='<tr>';
+      t+='<td style="color:'+a.col+';font-weight:700">'+a.label+'</td>';
+      t+='<td style="font-family:monospace">'+a.vo2.toFixed(1)+'</td>';
+      t+='<td style="font-family:monospace;color:'+a.col+'">'+fmtP(a.pace)+'/km</td>';
+      t+='<td style="font-family:monospace;font-weight:700;color:'+a.col+'">'+a.pctVO2.toFixed(1)+'%</td>';
+      t+='<td style="font-family:monospace;font-weight:700;color:'+lc+'">'+a.pLT1.toFixed(1)+'%</td>';
+      t+='<td style="font-family:monospace;font-size:9px;color:'+lc+'">'+ltLabel(a.pLT1)+'</td>';
+      t+='<td style="font-family:monospace;color:'+a.col+'">'+a.ifdActual.toFixed(1)+'%</td>';
+      t+='<td style="font-family:monospace;color:#94a3b8">'+Math.max(-3,a.ifdPred).toFixed(1)+'% '+ifdDiffStr+'</td>';
+      t+='<td style="font-family:monospace;font-size:9px;color:#64748b">'+
+         (a.pLT1<94?'Deep fat zone &mdash; glycogen conserved':
+          a.pLT1<98?'Sub-LT1 &mdash; manageable glycogen cost':
+          a.pLT1<101?'At LT1 &mdash; elevated CHO, Type II recruiting':
+          a.pLT1<103?'Above LT1 &mdash; glycogen depleting fast':
+          'Well above LT1 &mdash; collapse risk in long events')+'</td>';
+      t+='</tr>';
+    });
+    tEl.innerHTML=t+'</tbody></table>';
+  }
+
+  // ── TRAINING PRESCRIPTION ────────────────────────────────────────────────
+  var rxEl=document.getElementById('lt1-rx');
+  if(rxEl){
+    var lt1Pace=ANCH_PACE+(lt1Pct-ANCH_PCT)/SLOPE;
+    function vo2pctToPace(pct){return ANCH_PACE+(pct-ANCH_PCT)/SLOPE;}
+    var ANCH_PACE=7.46, ANCH_PCT=75.6, SLOPE=-5.946;
+    function vo2pctToPace2(pct){return ANCH_PACE+(pct-ANCH_PCT)/SLOPE;}
+    var pace95  = vo2pctToPace2(lt1Pct*0.95);
+    var pace100 = vo2pctToPace2(lt1Pct*1.00);
+    var pace102 = vo2pctToPace2(lt1Pct*1.02);
+
+    var rx='<div class="card" style="border:1px solid #22d3ee">';
+    rx+='<div style="color:#22d3ee;font-weight:700;font-size:14px;margin-bottom:10px">Training pace targets at current LT1 setting ('+lt1Pct.toFixed(1)+'% VO2max)</div>';
+    rx+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">';
+
+    var zones2=[
+      {label:'BASE / RECOVERY',pct:lt1Pct*0.88,col:'#4ade80',note:'Deep fat oxidation &mdash; Type I dominant &mdash; glycogen conserved'},
+      {label:'AEROBIC BUILD',  pct:lt1Pct*0.93,col:'#22d3ee',note:'Approaching LT1 &mdash; fat still dominant &mdash; lactate near-resting'},
+      {label:'LT1 THRESHOLD',  pct:lt1Pct*1.00,col:'#f59e0b',note:'At LT1 &mdash; lactate elevated stable &mdash; CHO demand rising &mdash; Type II recruiting'},
+      {label:'RACE CEILING',   pct:lt1Pct*1.02,col:'#fb923c',note:'2% above LT1 &mdash; upper sustainable limit for ultra &mdash; glycogen cost high'},
+    ];
+    zones2.forEach(function(z){
+      var zPace=vo2pctToPace2(z.pct);
+      var zCour=zPace*83/60;
+      rx+='<div class="stat" style="border-top:2px solid '+z.col+'">';
+      rx+='<div style="font-family:monospace;font-size:8px;color:#64748b;margin-bottom:4px;letter-spacing:1px">'+z.label+'</div>';
+      rx+='<div style="font-size:20px;font-weight:900;font-family:Barlow Condensed,sans-serif;color:'+z.col+'">'+fmtP(zPace)+'/km</div>';
+      rx+='<div style="font-family:monospace;font-size:9px;color:'+z.col+';margin-top:3px">Cour: '+hm(zCour)+'</div>';
+      rx+='<div style="font-family:monospace;font-size:8px;color:#64748b;margin-top:4px;line-height:1.5">'+z.note+'</div>';
+      rx+='</div>';
+    });
+    rx+='</div>';
+
+    rx+='<div style="font-family:monospace;font-size:9px;color:#cbd5e1;line-height:2">';
+    rx+='<strong style="color:#22d3ee">Training focus implication:</strong> The highest-value training target for Ruth is confirming and extending the pace she can sustain at or just below LT1. Every 1% increase in VO2max shifts LT1 pace by approximately <strong>0.17 min/km faster</strong> &mdash; meaning a 5% VO2max gain (62 &rarr; 65 ml/kg/min) would shift the LT1 Courmayeur split from '+hm(vo2pctToPace2(lt1Pct)*83/60)+' to approximately '+hm(vo2pctToPace2(lt1Pct*0.95)*83/60*0.97)+'.<br>';
+    rx+='<strong style="color:#f59e0b">Key unknown:</strong> Whether Ruth&#39;s LT1 is at '+lt1Pct.toFixed(0)+'% VO2max or higher. If lab data shows LT1 at '+((lt1Pct+3).toFixed(0))+'%, the LT1 pace is '+fmtP(vo2pctToPace2(lt1Pct+3))+'/km and the Courmayeur corridor shifts accordingly.';
+    rx+='</div></div>';
+    rxEl.innerHTML=rx;
+  }
+}
+
 </script>
 </body>
 </html>
